@@ -7,8 +7,10 @@ Live: https://free-convert.web.id
 ## Fitur
 
 - Gambar: JPG ↔ PNG ↔ WebP (kompres + konversi)
+- Resize gambar (batasi lebar maks: 1920/1280/800px)
 - Data: CSV ↔ Excel (XLSX) ↔ JSON
 - Gambar → PDF (gabung beberapa gambar jadi satu PDF)
+- Kompres PDF (render ulang halaman; teks jadi gambar — cocok untuk scan/foto)
 - Batch (beberapa file sekaligus)
 - Semua diproses di browser — file tidak dikirim ke server
 
@@ -24,7 +26,8 @@ Freemium. Gratis maksimal 5 file per batch. Paywall Pro masih berupa UI
 
 Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS 3
 
-Library konversi: `jspdf` (PDF), `xlsx` (data), Canvas API (gambar).
+Library konversi: `jspdf` (PDF), `xlsx` (data), `pdfjs-dist` (baca PDF untuk
+kompres), Canvas API (gambar).
 
 ## Jalankan lokal
 
