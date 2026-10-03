@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #f6f8fc;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background:
+    radial-gradient(60rem 40rem at 80% -10%, #e8efff 0%, transparent 60%),
+    radial-gradient(50rem 35rem at -10% 10%, #eef4ff 0%, transparent 55%),
+    var(--bg);
+  color: #0b1020;
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer utilities {
+  .container-tight {
+    @apply mx-auto w-full max-w-5xl px-5;
+  }
+}
