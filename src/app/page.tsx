@@ -1,5 +1,5 @@
 import Converter from "@/components/Converter";
-import { FREE_BATCH_LIMIT, PRO_PRICE_LABEL } from "@/lib/constants";
+import AdSlot from "@/components/AdSlot";
 
 const FEATURES = [
   {
@@ -7,8 +7,8 @@ const FEATURES = [
     body: "File tidak diunggah ke server. Lebih cepat dan privat.",
   },
   {
-    title: "Batch sekaligus",
-    body: "Konversi banyak file dalam satu kali jalan.",
+    title: "Gratis tanpa batas",
+    body: "Semua fitur bebas dipakai. Tanpa daftar, tanpa biaya.",
   },
   {
     title: "Tanpa instal",
@@ -29,12 +29,6 @@ export default function Home() {
           </span>
           <span className="font-bold text-ink-900">Free Convert</span>
         </div>
-        <a
-          href="#pricing"
-          className="rounded-lg border border-black/10 bg-white px-4 py-2 text-sm font-medium text-ink-700 hover:border-brand-300"
-        >
-          Harga
-        </a>
       </header>
 
       {/* Hero + converter */}
@@ -74,8 +68,13 @@ export default function Home() {
         <Converter />
       </section>
 
+      {/* Ad slot (top) */}
+      <section className="container-tight mt-14">
+        <AdSlot label="Ruang iklan" />
+      </section>
+
       {/* Features */}
-      <section className="container-tight mt-20 grid gap-4 sm:grid-cols-3">
+      <section className="container-tight mt-14 grid gap-4 sm:grid-cols-3">
         {FEATURES.map((f) => (
           <div
             key={f.title}
@@ -85,38 +84,6 @@ export default function Home() {
             <p className="mt-1 text-sm text-ink-500">{f.body}</p>
           </div>
         ))}
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="container-tight mt-20">
-        <h2 className="text-center text-2xl font-bold text-ink-900">
-          Harga sederhana
-        </h2>
-        <div className="mx-auto mt-8 grid max-w-3xl gap-5 sm:grid-cols-2">
-          <div className="rounded-2xl border border-black/5 bg-white/80 p-6">
-            <h3 className="font-semibold text-ink-900">Gratis</h3>
-            <p className="mt-1 text-3xl font-extrabold text-ink-900">Rp0</p>
-            <ul className="mt-4 space-y-2 text-sm text-ink-700">
-              <li>✓ Semua format konversi</li>
-              <li>✓ Maksimal {FREE_BATCH_LIMIT} file per batch</li>
-              <li>✓ Diproses di browser</li>
-            </ul>
-          </div>
-          <div className="rounded-2xl border-2 border-brand-500 bg-white p-6">
-            <h3 className="font-semibold text-brand-700">Pro</h3>
-            <p className="mt-1 text-3xl font-extrabold text-ink-900">
-              {PRO_PRICE_LABEL}
-            </p>
-            <ul className="mt-4 space-y-2 text-sm text-ink-700">
-              <li>✓ Batch tanpa batas</li>
-              <li>✓ Kualitas penuh</li>
-              <li>✓ Prioritas fitur baru</li>
-            </ul>
-            <button className="mt-5 w-full cursor-not-allowed rounded-xl bg-brand-500 py-3 font-semibold text-white opacity-70">
-              Segera hadir
-            </button>
-          </div>
-        </div>
       </section>
 
       {/* Coming soon */}
@@ -137,10 +104,13 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Ad slot (bottom) */}
+      <section className="container-tight mt-14">
+        <AdSlot label="Ruang iklan" />
+      </section>
+
       <footer className="container-tight mt-20 text-center text-sm text-ink-500">
-        <p>
-          © {new Date().getFullYear()} Free Convert · free-convert.web.id
-        </p>
+        <p>© {new Date().getFullYear()} Free Convert · free-convert.web.id</p>
       </footer>
     </main>
   );

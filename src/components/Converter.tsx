@@ -13,7 +13,6 @@ import { convertData } from "@/lib/data";
 import { imagesToPdf } from "@/lib/pdf";
 import { compressPdf } from "@/lib/pdfCompress";
 import { downloadAll, downloadBlob } from "@/lib/download";
-import { FREE_BATCH_LIMIT, PRO_PRICE_LABEL } from "@/lib/constants";
 
 const KINDS: { value: ConvertKind; label: string; hint: string }[] = [
   { value: "image", label: "Gambar", hint: "JPG · PNG · WebP" },
@@ -44,10 +43,14 @@ export default function Converter() {
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [maxWidth, setMaxWidth] = useState(0);
+  const [quality, setQuality] = useState(0.8);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const targets = TARGETS_BY_KIND[kind];
-  const overLimit = files.length > FREE_BATCH_LIMIT;
+
+  // PNG is lossless; quality has no effect. Show slider only where it matters.
+  const showQuality =
+    (kind === "image" && target !== "png") || kind === "pdfcompress";
 
   const selectKind = useCallback((k: ConvertKind) => {
     setKind(k);
@@ -70,12 +73,6 @@ export default function Converter() {
       setError("Pilih file dulu.");
       return;
     }
-    if (overLimit) {
-      setError(
-        `Versi gratis maksimal ${FREE_BATCH_LIMIT} file per batch. Upgrade untuk unlimited.`,
-      );
-      return;
-    }
     setBusy(true);
     setError(null);
     try {
@@ -87,9 +84,9 @@ export default function Converter() {
         for (const f of files) {
           let res: ConvertResult;
           if (kind === "image") {
-            res = await convertImage(f, target, { maxWidth });
+            res = await convertImage(f, target, { maxWidth, quality });
           } else if (kind === "pdfcompress") {
-            res = await compressPdf(f);
+            res = await compressPdf(f, { quality });
           } else {
             res = await convertData(f, target);
           }
@@ -102,7 +99,7 @@ export default function Converter() {
     } finally {
       setBusy(false);
     }
-  }, [files, kind, target, overLimit, maxWidth]);
+  }, [files, kind, target, maxWidth, quality]);
 
   const totalSize = useMemo(
     () => files.reduce((s, f) => s + f.size, 0),
@@ -182,6 +179,33 @@ export default function Converter() {
         </div>
       )}
 
+      {/* Quality slider */}
+      {showQuality && (
+        <div className="mt-5">
+          <div className="flex items-center justify-between">
+            <label htmlFor="quality" className="text-sm font-medium text-ink-700">
+              Kualitas
+            </label>
+            <span className="text-sm font-semibold text-brand-700">
+              {Math.round(quality * 100)}%
+            </span>
+          </div>
+          <input
+            id="quality"
+            type="range"
+            min={0.1}
+            max={1}
+            step={0.05}
+            value={quality}
+            onChange={(e) => setQuality(Number(e.target.value))}
+            className="mt-2 w-full accent-brand-500"
+          />
+          <p className="mt-1 text-xs text-ink-500">
+            Lebih rendah = ukuran file lebih kecil.
+          </p>
+        </div>
+      )}
+
       {/* Compress PDF note */}
       {kind === "pdfcompress" && (
         <div className="mt-5 rounded-lg border border-black/10 bg-brand-50/60 px-4 py-3 text-sm text-ink-700">
@@ -244,9 +268,7 @@ export default function Converter() {
             {files.map((f, i) => (
               <li
                 key={`${f.name}-${i}`}
-                className={`flex items-center justify-between gap-3 px-3 py-2 text-sm ${
-                  i >= FREE_BATCH_LIMIT ? "bg-amber-50" : "bg-white"
-                }`}
+                className="flex items-center justify-between gap-3 bg-white px-3 py-2 text-sm"
               >
                 <span className="truncate text-ink-700">{f.name}</span>
                 <div className="flex shrink-0 items-center gap-3">
@@ -264,14 +286,6 @@ export default function Converter() {
               </li>
             ))}
           </ul>
-        </div>
-      )}
-
-      {/* Over limit notice */}
-      {overLimit && (
-        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Versi gratis maksimal {FREE_BATCH_LIMIT} file per batch. Upgrade ke
-          Pro ({PRO_PRICE_LABEL}) untuk batch tanpa batas.
         </div>
       )}
 
