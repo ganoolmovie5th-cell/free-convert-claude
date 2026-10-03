@@ -26,3 +26,18 @@ body {
     @apply mx-auto w-full max-w-5xl px-5;
   }
 }
+
+@layer components {
+  .prose-page h2 {
+    @apply mt-8 text-lg font-semibold text-ink-900;
+  }
+  .prose-page p {
+    @apply leading-relaxed;
+  }
+  .prose-page ul {
+    @apply list-disc space-y-1 pl-5;
+  }
+  .prose-page a {
+    @apply text-brand-700 underline hover:text-brand-600;
+  }
+}

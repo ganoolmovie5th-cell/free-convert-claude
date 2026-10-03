@@ -1,5 +1,6 @@
 import Converter from "@/components/Converter";
 import AdSlot from "@/components/AdSlot";
+import SiteFooter from "@/components/SiteFooter";
 
 const FEATURES = [
   {
@@ -109,9 +110,7 @@ export default function Home() {
         <AdSlot label="Ruang iklan" />
       </section>
 
-      <footer className="container-tight mt-20 text-center text-sm text-ink-500">
-        <p>© {new Date().getFullYear()} Free Convert · free-convert.web.id</p>
-      </footer>
+      <SiteFooter />
     </main>
   );
 }
