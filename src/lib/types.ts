@@ -56,3 +56,15 @@ export function baseName(name: string): string {
   const i = name.lastIndexOf(".");
   return i === -1 ? name : name.slice(0, i);
 }
+
+// Match a file against the kind's accept list (MIME types + extensions).
+export function fileMatchesKind(file: File, kind: ConvertKind): boolean {
+  const accept = ACCEPT_BY_KIND[kind]
+    .split(",")
+    .map((s) => s.trim().toLowerCase());
+  const name = file.name.toLowerCase();
+  const type = file.type.toLowerCase();
+  return accept.some((a) =>
+    a.startsWith(".") ? name.endsWith(a) : type === a,
+  );
+}

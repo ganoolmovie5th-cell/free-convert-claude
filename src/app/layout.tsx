@@ -27,6 +27,12 @@ export const metadata: Metadata = {
     locale: "id_ID",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Free Convert — Konversi File Online Gratis",
+    description:
+      "Konversi & kompres file di browser. Privat, tanpa upload ke server.",
+  },
   robots: { index: true, follow: true },
 };
 

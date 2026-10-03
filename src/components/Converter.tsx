@@ -5,6 +5,7 @@ import {
   ACCEPT_BY_KIND,
   ConvertKind,
   ConvertResult,
+  fileMatchesKind,
   TARGETS_BY_KIND,
   TargetFormat,
 } from "@/lib/types";
@@ -72,6 +73,11 @@ export default function Converter({
   const [quality, setQuality] = useState(0.8);
   const [range, setRange] = useState("");
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [summary, setSummary] = useState<{
+    count: number;
+    before: number;
+    after: number;
+  } | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -92,11 +98,24 @@ export default function Converter({
     setError(null);
   }, []);
 
-  const addFiles = useCallback((list: FileList | null) => {
-    if (!list) return;
-    setError(null);
-    setFiles((prev) => [...prev, ...Array.from(list)]);
-  }, []);
+  const addFiles = useCallback(
+    (list: FileList | null) => {
+      if (!list) return;
+      const incoming = Array.from(list);
+      const ok = incoming.filter((f) => fileMatchesKind(f, kind));
+      const rejected = incoming.length - ok.length;
+      setError(
+        rejected > 0
+          ? `${rejected} file dilewati karena formatnya tidak cocok untuk alat ini.`
+          : null,
+      );
+      if (ok.length > 0) {
+        setSummary(null);
+        setFiles((prev) => [...prev, ...ok]);
+      }
+    },
+    [kind],
+  );
 
   const removeFile = (i: number) =>
     setFiles((prev) => prev.filter((_, idx) => idx !== i));
@@ -108,6 +127,7 @@ export default function Converter({
     }
     setBusy(true);
     setError(null);
+    setSummary(null);
     try {
       let results: ConvertResult[] = [];
 
@@ -132,6 +152,11 @@ export default function Converter({
       }
 
       downloadAll(results);
+      setSummary({
+        count: results.length,
+        before: files.reduce((s, f) => s + f.size, 0),
+        after: results.reduce((s, r) => s + r.blob.size, 0),
+      });
       setHistory(
         addHistory(
           results.map((r) => ({
@@ -400,6 +425,22 @@ export default function Converter({
         <p className="mt-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
         </p>
+      )}
+
+      {/* Success summary */}
+      {summary && (
+        <div className="mt-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+          <p className="font-medium">
+            Selesai — {summary.count} file diunduh.
+          </p>
+          <p className="mt-0.5 text-green-700">
+            {fmtSize(summary.before)} → {fmtSize(summary.after)}
+            {summary.after < summary.before &&
+              ` · hemat ${Math.round(
+                (1 - summary.after / summary.before) * 100,
+              )}%`}
+          </p>
+        </div>
       )}
 
       {/* Action */}
