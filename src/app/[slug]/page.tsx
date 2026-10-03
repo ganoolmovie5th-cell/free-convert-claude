@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Converter from "@/components/Converter";
 import SiteFooter from "@/components/SiteFooter";
+import JsonLd from "@/components/JsonLd";
 import { TOOLS, toolBySlug } from "@/lib/tools";
 
 export function generateStaticParams() {
@@ -35,8 +36,19 @@ export default async function ToolPage({
 
   const others = TOOLS.filter((t) => t.slug !== tool.slug);
 
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: tool.faq.map((f) => ({
+      "@type": "Question",
+      name: f.q,
+      acceptedAnswer: { "@type": "Answer", text: f.a },
+    })),
+  };
+
   return (
     <main className="min-h-screen pb-16">
+      <JsonLd data={faqSchema} />
       <header className="container-tight flex items-center justify-between py-5">
         <Link href="/" className="flex items-center gap-2">
           <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-sm font-bold text-white">
@@ -66,6 +78,21 @@ export default async function ToolPage({
         </div>
 
         <Converter only={tool.kind} lockTarget={tool.lockTarget} />
+      </section>
+
+      {/* FAQ */}
+      <section className="container-tight mt-16 max-w-2xl">
+        <h2 className="text-xl font-bold text-ink-900">Pertanyaan umum</h2>
+        <dl className="mt-5 space-y-5">
+          {tool.faq.map((f) => (
+            <div key={f.q}>
+              <dt className="font-semibold text-ink-900">{f.q}</dt>
+              <dd className="mt-1 text-sm leading-relaxed text-ink-700">
+                {f.a}
+              </dd>
+            </div>
+          ))}
+        </dl>
       </section>
 
       {/* Other tools */}

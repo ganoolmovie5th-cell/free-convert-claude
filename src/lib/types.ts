@@ -5,7 +5,9 @@ export type ConvertKind =
   | "pdfcompress"
   | "pdf2img"
   | "pdfmerge"
-  | "pdfsplit";
+  | "pdfsplit"
+  | "watermark"
+  | "pdfunlock";
 
 export type TargetFormat =
   | "jpeg"
@@ -29,6 +31,8 @@ export const ACCEPT_BY_KIND: Record<ConvertKind, string> = {
   pdf2img: "application/pdf,.pdf",
   pdfmerge: "application/pdf,.pdf",
   pdfsplit: "application/pdf,.pdf",
+  watermark: "image/jpeg,image/png,image/webp",
+  pdfunlock: "application/pdf,.pdf",
 };
 
 export const TARGETS_BY_KIND: Record<
@@ -50,6 +54,8 @@ export const TARGETS_BY_KIND: Record<
   pdf2img: [{ value: "jpeg", label: "JPG" }],
   pdfmerge: [{ value: "pdf", label: "PDF" }],
   pdfsplit: [{ value: "pdf", label: "PDF" }],
+  watermark: [{ value: "jpeg", label: "JPG" }],
+  pdfunlock: [{ value: "pdf", label: "PDF" }],
 };
 
 export function baseName(name: string): string {

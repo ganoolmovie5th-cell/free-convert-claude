@@ -15,6 +15,8 @@ import { imagesToPdf } from "@/lib/pdf";
 import { compressPdf } from "@/lib/pdfCompress";
 import { pdfToImages } from "@/lib/pdfToImages";
 import { mergePdf, splitPdf } from "@/lib/pdfOps";
+import { watermarkImage } from "@/lib/watermark";
+import { unlockPdf } from "@/lib/pdfUnlock";
 import { downloadAll } from "@/lib/download";
 import {
   addHistory,
@@ -31,7 +33,12 @@ const KINDS: { value: ConvertKind; label: string; hint: string }[] = [
   { value: "pdf2img", label: "PDF → JPG", hint: "Tiap halaman jadi gambar" },
   { value: "pdfmerge", label: "Gabung PDF", hint: "Banyak PDF jadi 1" },
   { value: "pdfsplit", label: "Pisah PDF", hint: "Ambil halaman tertentu" },
+  { value: "watermark", label: "Watermark", hint: "Teks di atas gambar" },
+  { value: "pdfunlock", label: "Buka Proteksi", hint: "Hapus pembatasan PDF" },
 ];
+
+// Warn (not block) above this total; huge files can hang the browser tab.
+const SIZE_WARN = 100 * 1024 * 1024; // 100 MB
 
 const RESIZE_PRESETS = [
   { value: 0, label: "Asli" },
@@ -53,6 +60,32 @@ function fmtSize(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
+// Small preview for image files; shows a dot for non-images (PDF/CSV).
+function FileThumb({ file }: { file: File }) {
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => {
+    if (!file.type.startsWith("image/")) return;
+    const u = URL.createObjectURL(file);
+    setUrl(u);
+    return () => URL.revokeObjectURL(u);
+  }, [file]);
+
+  if (!url)
+    return (
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded bg-brand-50 text-[10px] font-semibold text-brand-700">
+        {file.name.split(".").pop()?.slice(0, 4).toUpperCase() || "FILE"}
+      </span>
+    );
+  // eslint-disable-next-line @next/next/no-img-element
+  return (
+    <img
+      src={url}
+      alt=""
+      className="h-8 w-8 shrink-0 rounded object-cover"
+    />
+  );
+}
+
 export default function Converter({
   only,
   lockTarget,
@@ -72,6 +105,8 @@ export default function Converter({
   const [rotate, setRotate] = useState(0);
   const [quality, setQuality] = useState(0.8);
   const [range, setRange] = useState("");
+  const [watermarkText, setWatermarkText] = useState("");
+  const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [summary, setSummary] = useState<{
     count: number;
@@ -89,7 +124,8 @@ export default function Converter({
   const showQuality =
     (kind === "image" && target !== "png") ||
     kind === "pdfcompress" ||
-    kind === "pdf2img";
+    kind === "pdf2img" ||
+    kind === "watermark";
 
   const selectKind = useCallback((k: ConvertKind) => {
     setKind(k);
@@ -132,15 +168,25 @@ export default function Converter({
       let results: ConvertResult[] = [];
 
       if (kind === "pdf") {
+        setProgress({ done: 0, total: 1 });
         results = [await imagesToPdf(files)];
+        setProgress({ done: 1, total: 1 });
       } else if (kind === "pdfmerge") {
+        setProgress({ done: 0, total: 1 });
         results = [await mergePdf(files)];
+        setProgress({ done: 1, total: 1 });
       } else {
-        for (const f of files) {
+        setProgress({ done: 0, total: files.length });
+        for (let i = 0; i < files.length; i++) {
+          const f = files[i];
           if (kind === "image") {
             results.push(await convertImage(f, target, { maxWidth, quality, rotate }));
+          } else if (kind === "watermark") {
+            results.push(await watermarkImage(f, { text: watermarkText, quality }));
           } else if (kind === "pdfcompress") {
             results.push(await compressPdf(f, { quality }));
+          } else if (kind === "pdfunlock") {
+            results.push(await unlockPdf(f));
           } else if (kind === "pdf2img") {
             results.push(...(await pdfToImages(f, quality)));
           } else if (kind === "pdfsplit") {
@@ -148,10 +194,11 @@ export default function Converter({
           } else {
             results.push(await convertData(f, target));
           }
+          setProgress({ done: i + 1, total: files.length });
         }
       }
 
-      downloadAll(results);
+      await downloadAll(results);
       setSummary({
         count: results.length,
         before: files.reduce((s, f) => s + f.size, 0),
@@ -172,7 +219,7 @@ export default function Converter({
     } finally {
       setBusy(false);
     }
-  }, [files, kind, target, maxWidth, quality, rotate, range]);
+  }, [files, kind, target, maxWidth, quality, rotate, range, watermarkText]);
 
   const totalSize = useMemo(
     () => files.reduce((s, f) => s + f.size, 0),
@@ -180,7 +227,9 @@ export default function Converter({
   );
 
   const actionLabel = busy
-    ? "Memproses…"
+    ? progress.total > 1
+      ? `Memproses ${progress.done}/${progress.total}…`
+      : "Memproses…"
     : kind === "pdf"
       ? "Gabungkan jadi PDF"
       : kind === "pdfmerge"
@@ -191,7 +240,13 @@ export default function Converter({
             ? "Kompres & Unduh"
             : kind === "pdf2img"
               ? "Ubah ke JPG"
-              : "Konversi & Unduh";
+              : kind === "watermark"
+                ? "Tambah Watermark"
+                : kind === "pdfunlock"
+                  ? "Hapus Proteksi"
+                  : "Konversi & Unduh";
+
+  const overSizeWarn = totalSize > SIZE_WARN;
 
   return (
     <div className="rounded-2xl border border-black/5 bg-white/80 p-5 shadow-xl shadow-brand-500/5 backdrop-blur sm:p-7">
@@ -308,6 +363,35 @@ export default function Converter({
         </div>
       )}
 
+      {/* Watermark text */}
+      {kind === "watermark" && (
+        <div className="mt-5">
+          <label
+            htmlFor="watermark"
+            className="text-sm font-medium text-ink-700"
+          >
+            Teks watermark
+          </label>
+          <input
+            id="watermark"
+            type="text"
+            value={watermarkText}
+            onChange={(e) => setWatermarkText(e.target.value)}
+            placeholder="contoh: © Nama Kamu"
+            className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-2 text-sm text-ink-900 outline-none focus:border-brand-400"
+          />
+        </div>
+      )}
+
+      {/* Unlock PDF note */}
+      {kind === "pdfunlock" && (
+        <div className="mt-5 rounded-lg border border-black/10 bg-brand-50/60 px-4 py-3 text-sm text-ink-700">
+          Menghapus pembatasan salin, cetak, dan edit dari PDF yang bisa dibuka.
+          Bukan untuk membuka PDF yang terkunci password buka. Gunakan hanya
+          untuk file milik kamu sendiri.
+        </div>
+      )}
+
       {/* Quality slider */}
       {showQuality && (
         <div className="mt-5">
@@ -382,6 +466,14 @@ export default function Converter({
         </p>
       </div>
 
+      {/* Size warning */}
+      {overSizeWarn && (
+        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Total file cukup besar ({fmtSize(totalSize)}). Pemrosesan bisa lambat
+          atau membebani browser di perangkat yang lebih lemah.
+        </div>
+      )}
+
       {/* File list */}
       {files.length > 0 && (
         <div className="mt-4 space-y-2">
@@ -402,14 +494,17 @@ export default function Converter({
                 key={`${f.name}-${i}`}
                 className="flex items-center justify-between gap-3 bg-white px-3 py-2 text-sm"
               >
-                <span className="truncate text-ink-700">{f.name}</span>
+                <div className="flex min-w-0 items-center gap-2">
+                  <FileThumb file={f} />
+                  <span className="truncate text-ink-700">{f.name}</span>
+                </div>
                 <div className="flex shrink-0 items-center gap-3">
                   <span className="text-xs text-ink-500">
                     {fmtSize(f.size)}
                   </span>
                   <button
                     onClick={() => removeFile(i)}
-                    className="text-ink-500 hover:text-red-500"
+                    className="rounded text-ink-500 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
                     aria-label={`Hapus ${f.name}`}
                   >
                     ✕

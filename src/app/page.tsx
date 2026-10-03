@@ -2,6 +2,7 @@ import Link from "next/link";
 import Converter from "@/components/Converter";
 import AdSlot from "@/components/AdSlot";
 import SiteFooter from "@/components/SiteFooter";
+import JsonLd from "@/components/JsonLd";
 import { TOOLS } from "@/lib/tools";
 
 const FEATURES = [
@@ -21,9 +22,22 @@ const FEATURES = [
 
 const SOON = ["Word → PDF", "Excel → PDF", "PDF → Word", "PowerPoint → PDF"];
 
+const appSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  name: "Free Convert",
+  url: "https://www.free-convert.web.id",
+  applicationCategory: "UtilitiesApplication",
+  operatingSystem: "Web",
+  offers: { "@type": "Offer", price: "0", priceCurrency: "IDR" },
+  description:
+    "Konversi dan kompres file (gambar, PDF, Excel, CSV) langsung di browser, gratis dan tanpa upload ke server.",
+};
+
 export default function Home() {
   return (
     <main className="min-h-screen pb-24">
+      <JsonLd data={appSchema} />
       {/* Nav */}
       <header className="container-tight flex items-center justify-between py-5">
         <div className="flex items-center gap-2">
