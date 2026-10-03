@@ -15,10 +15,15 @@ Live: https://free-convert.web.id
 - Gabung PDF (beberapa PDF jadi satu, isi dokumen tetap utuh)
 - Pisah PDF (ambil halaman tertentu, misal 1-3,5)
 - Putar gambar (90/180/270°)
-- Slider kualitas untuk gambar (JPG/WebP), kompres PDF, dan PDF → JPG
+- Watermark gambar (teks diagonal berulang)
+- Hapus proteksi PDF (pembatasan copy/print/edit — bukan password buka)
+- Slider kualitas untuk gambar (JPG/WebP), kompres PDF, PDF → JPG, watermark
+- Batch (beberapa file sekaligus); hasil banyak file otomatis jadi satu ZIP
+- Progres per-file + peringatan ukuran besar
 - Riwayat lokal konversi terakhir (disimpan di browser)
-- Halaman alat terpisah per fungsi untuk SEO (mis. /kompres-gambar, /gabung-pdf)
-- Batch (beberapa file sekaligus)
+- Preview thumbnail gambar sebelum konversi
+- Halaman alat terpisah per fungsi + FAQ untuk SEO (mis. /kompres-gambar)
+- Structured data (JSON-LD) untuk hasil pencarian yang lebih kaya
 - Semua diproses di browser — file tidak dikirim ke server
 
 Konversi dokumen Office (Word/Excel/PowerPoint → PDF) butuh pemrosesan di
@@ -43,8 +48,9 @@ disetujui.
 
 Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS 3
 
-Library konversi: `jspdf` (buat PDF), `pdf-lib` (gabung/pisah PDF),
-`pdfjs-dist` (baca/render PDF), `xlsx` (data), Canvas API (gambar).
+Library konversi: `jspdf` (buat PDF), `pdf-lib` (gabung/pisah/hapus proteksi
+PDF), `pdfjs-dist` (baca/render PDF), `xlsx` (data), `fflate` (ZIP),
+Canvas API (gambar + watermark).
 
 ## Jalankan lokal
 
