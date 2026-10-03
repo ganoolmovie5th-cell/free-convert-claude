@@ -62,6 +62,12 @@ export default function Home() {
             <span className="rounded-full bg-white px-3 py-1 shadow-sm">
               Gambar → PDF
             </span>
+            <span className="rounded-full bg-white px-3 py-1 shadow-sm">
+              Resize gambar
+            </span>
+            <span className="rounded-full bg-white px-3 py-1 shadow-sm">
+              Kompres PDF
+            </span>
           </div>
         </div>
 

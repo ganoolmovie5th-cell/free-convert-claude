@@ -17,18 +17,34 @@ async function loadBitmap(file: File): Promise<ImageBitmap> {
   return await createImageBitmap(file);
 }
 
+export interface ImageOptions {
+  quality?: number;
+  // Downscale so width does not exceed maxWidth (keeps aspect ratio).
+  // 0 or undefined = keep original size.
+  maxWidth?: number;
+}
+
 export async function convertImage(
   file: File,
   target: TargetFormat,
-  quality = 0.85,
+  opts: ImageOptions = {},
 ): Promise<ConvertResult> {
+  const { quality = 0.85, maxWidth = 0 } = opts;
   const mime = MIME[target];
   if (!mime) throw new Error("Format gambar tidak didukung: " + target);
 
   const bitmap = await loadBitmap(file);
+
+  let w = bitmap.width;
+  let h = bitmap.height;
+  if (maxWidth > 0 && w > maxWidth) {
+    h = Math.round((h * maxWidth) / w);
+    w = maxWidth;
+  }
+
   const canvas = document.createElement("canvas");
-  canvas.width = bitmap.width;
-  canvas.height = bitmap.height;
+  canvas.width = w;
+  canvas.height = h;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas tidak tersedia di browser ini.");
 
@@ -37,7 +53,7 @@ export async function convertImage(
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
-  ctx.drawImage(bitmap, 0, 0);
+  ctx.drawImage(bitmap, 0, 0, w, h);
   bitmap.close();
 
   const blob = await new Promise<Blob | null>((resolve) =>

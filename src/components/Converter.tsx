@@ -11,6 +11,7 @@ import {
 import { convertImage } from "@/lib/image";
 import { convertData } from "@/lib/data";
 import { imagesToPdf } from "@/lib/pdf";
+import { compressPdf } from "@/lib/pdfCompress";
 import { downloadAll, downloadBlob } from "@/lib/download";
 import { FREE_BATCH_LIMIT, PRO_PRICE_LABEL } from "@/lib/constants";
 
@@ -18,6 +19,15 @@ const KINDS: { value: ConvertKind; label: string; hint: string }[] = [
   { value: "image", label: "Gambar", hint: "JPG · PNG · WebP" },
   { value: "data", label: "Data", hint: "CSV · Excel · JSON" },
   { value: "pdf", label: "Gambar → PDF", hint: "Gabung jadi 1 PDF" },
+  { value: "pdfcompress", label: "Kompres PDF", hint: "Perkecil ukuran" },
+];
+
+// Resize presets for the image tab. 0 = original size.
+const RESIZE_PRESETS: { value: number; label: string }[] = [
+  { value: 0, label: "Asli" },
+  { value: 1920, label: "1920px" },
+  { value: 1280, label: "1280px" },
+  { value: 800, label: "800px" },
 ];
 
 function fmtSize(bytes: number) {
@@ -33,6 +43,7 @@ export default function Converter() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+  const [maxWidth, setMaxWidth] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const targets = TARGETS_BY_KIND[kind];
@@ -74,10 +85,14 @@ export default function Converter() {
       } else {
         const results: ConvertResult[] = [];
         for (const f of files) {
-          const res =
-            kind === "image"
-              ? await convertImage(f, target)
-              : await convertData(f, target);
+          let res: ConvertResult;
+          if (kind === "image") {
+            res = await convertImage(f, target, { maxWidth });
+          } else if (kind === "pdfcompress") {
+            res = await compressPdf(f);
+          } else {
+            res = await convertData(f, target);
+          }
           results.push(res);
         }
         downloadAll(results);
@@ -87,7 +102,7 @@ export default function Converter() {
     } finally {
       setBusy(false);
     }
-  }, [files, kind, target, overLimit]);
+  }, [files, kind, target, overLimit, maxWidth]);
 
   const totalSize = useMemo(
     () => files.reduce((s, f) => s + f.size, 0),
@@ -97,7 +112,7 @@ export default function Converter() {
   return (
     <div className="rounded-2xl border border-black/5 bg-white/80 p-5 shadow-xl shadow-brand-500/5 backdrop-blur sm:p-7">
       {/* Kind tabs */}
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
         {KINDS.map((k) => {
           const active = k.value === kind;
           return (
@@ -120,7 +135,7 @@ export default function Converter() {
       </div>
 
       {/* Target format */}
-      {kind !== "pdf" && (
+      {kind !== "pdf" && kind !== "pdfcompress" && (
         <div className="mt-5">
           <label className="text-sm font-medium text-ink-700">
             Konversi ke
@@ -140,6 +155,39 @@ export default function Converter() {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Resize (image only) */}
+      {kind === "image" && (
+        <div className="mt-5">
+          <label className="text-sm font-medium text-ink-700">
+            Ubah ukuran (lebar maks)
+          </label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {RESIZE_PRESETS.map((p) => (
+              <button
+                key={p.value}
+                onClick={() => setMaxWidth(p.value)}
+                className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                  maxWidth === p.value
+                    ? "border-brand-500 bg-brand-500 text-white"
+                    : "border-black/10 bg-white text-ink-700 hover:border-brand-300"
+                }`}
+              >
+                {p.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Compress PDF note */}
+      {kind === "pdfcompress" && (
+        <div className="mt-5 rounded-lg border border-black/10 bg-brand-50/60 px-4 py-3 text-sm text-ink-700">
+          Perkecil ukuran PDF dengan render ulang halaman. Teks akan menjadi
+          gambar (tidak bisa diseleksi). Cocok untuk hasil scan dan PDF berisi
+          foto.
         </div>
       )}
 
@@ -243,7 +291,9 @@ export default function Converter() {
           ? "Memproses…"
           : kind === "pdf"
             ? "Gabungkan jadi PDF"
-            : "Konversi & Unduh"}
+            : kind === "pdfcompress"
+              ? "Kompres & Unduh"
+              : "Konversi & Unduh"}
       </button>
     </div>
   );
