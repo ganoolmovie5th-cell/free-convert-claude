@@ -11,6 +11,7 @@ Live: https://free-convert.web.id
 - Data: CSV ↔ Excel (XLSX) ↔ JSON
 - Gambar → PDF (gabung beberapa gambar jadi satu PDF)
 - Kompres PDF (render ulang halaman; teks jadi gambar — cocok untuk scan/foto)
+- Slider kualitas untuk gambar (JPG/WebP) dan kompres PDF
 - Batch (beberapa file sekaligus)
 - Semua diproses di browser — file tidak dikirim ke server
 
@@ -19,8 +20,18 @@ server dan belum tersedia. Ditandai "Segera hadir" di UI.
 
 ## Model
 
-Freemium. Gratis maksimal 5 file per batch. Paywall Pro masih berupa UI
-(tombol "Segera hadir") — hook pembayaran belum dipasang.
+Gratis sepenuhnya, didanai iklan. Tanpa langganan, tanpa batas file.
+
+Slot iklan ada di `src/components/AdSlot.tsx` (masih placeholder). Untuk
+pasang Google AdSense:
+
+1. Daftar + verifikasi domain `free-convert.web.id` di AdSense.
+2. Tambahkan script AdSense di `src/app/layout.tsx` (via `next/script`).
+3. Ganti isi `AdSlot.tsx` dengan unit iklan (`<ins class="adsbygoogle">` +
+   `(adsbygoogle = window.adsbygoogle || []).push({})`).
+
+AdSense butuh domain yang sudah live dan konten yang memadai sebelum
+disetujui.
 
 ## Stack
 
