@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
-const SITE = "https://free-convert.web.id";
+const SITE = "https://www.free-convert.web.id";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
