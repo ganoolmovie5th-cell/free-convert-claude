@@ -11,7 +11,13 @@ Live: https://free-convert.web.id
 - Data: CSV ↔ Excel (XLSX) ↔ JSON
 - Gambar → PDF (gabung beberapa gambar jadi satu PDF)
 - Kompres PDF (render ulang halaman; teks jadi gambar — cocok untuk scan/foto)
-- Slider kualitas untuk gambar (JPG/WebP) dan kompres PDF
+- PDF → JPG (tiap halaman jadi gambar)
+- Gabung PDF (beberapa PDF jadi satu, isi dokumen tetap utuh)
+- Pisah PDF (ambil halaman tertentu, misal 1-3,5)
+- Putar gambar (90/180/270°)
+- Slider kualitas untuk gambar (JPG/WebP), kompres PDF, dan PDF → JPG
+- Riwayat lokal konversi terakhir (disimpan di browser)
+- Halaman alat terpisah per fungsi untuk SEO (mis. /kompres-gambar, /gabung-pdf)
 - Batch (beberapa file sekaligus)
 - Semua diproses di browser — file tidak dikirim ke server
 
@@ -37,8 +43,8 @@ disetujui.
 
 Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS 3
 
-Library konversi: `jspdf` (PDF), `xlsx` (data), `pdfjs-dist` (baca PDF untuk
-kompres), Canvas API (gambar).
+Library konversi: `jspdf` (buat PDF), `pdf-lib` (gabung/pisah PDF),
+`pdfjs-dist` (baca/render PDF), `xlsx` (data), Canvas API (gambar).
 
 ## Jalankan lokal
 
