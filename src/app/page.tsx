@@ -64,19 +64,19 @@ export default function Home() {
             instal aplikasi.
           </p>
           <div className="mt-6 flex flex-wrap gap-2 text-sm text-ink-500">
-            <span className="rounded-full bg-white px-3 py-1 shadow-sm">
+            <span className="rounded-full bg-white px-3 py-1 shadow-xs">
               JPG ↔ PNG ↔ WebP
             </span>
-            <span className="rounded-full bg-white px-3 py-1 shadow-sm">
+            <span className="rounded-full bg-white px-3 py-1 shadow-xs">
               CSV ↔ Excel ↔ JSON
             </span>
-            <span className="rounded-full bg-white px-3 py-1 shadow-sm">
+            <span className="rounded-full bg-white px-3 py-1 shadow-xs">
               Gambar → PDF
             </span>
-            <span className="rounded-full bg-white px-3 py-1 shadow-sm">
+            <span className="rounded-full bg-white px-3 py-1 shadow-xs">
               Resize gambar
             </span>
-            <span className="rounded-full bg-white px-3 py-1 shadow-sm">
+            <span className="rounded-full bg-white px-3 py-1 shadow-xs">
               Kompres PDF
             </span>
           </div>

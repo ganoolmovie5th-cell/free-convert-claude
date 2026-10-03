@@ -72,7 +72,7 @@ function FileThumb({ file }: { file: File }) {
 
   if (!url)
     return (
-      <span className="grid h-8 w-8 shrink-0 place-items-center rounded bg-brand-50 text-[10px] font-semibold text-brand-700">
+      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-sm bg-brand-50 text-[10px] font-semibold text-brand-700">
         {file.name.split(".").pop()?.slice(0, 4).toUpperCase() || "FILE"}
       </span>
     );
@@ -81,7 +81,7 @@ function FileThumb({ file }: { file: File }) {
     <img
       src={url}
       alt=""
-      className="h-8 w-8 shrink-0 rounded object-cover"
+      className="h-8 w-8 shrink-0 rounded-sm object-cover"
     />
   );
 }
@@ -249,7 +249,7 @@ export default function Converter({
   const overSizeWarn = totalSize > SIZE_WARN;
 
   return (
-    <div className="rounded-2xl border border-black/5 bg-white/80 p-5 shadow-xl shadow-brand-500/5 backdrop-blur sm:p-7">
+    <div className="rounded-2xl border border-black/5 bg-white/80 p-5 shadow-xl shadow-brand-500/5 backdrop-blur-sm sm:p-7">
       {/* Kind tabs — hidden when locked to a single tool */}
       {!only && (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -355,7 +355,7 @@ export default function Converter({
             value={range}
             onChange={(e) => setRange(e.target.value)}
             placeholder="contoh: 1-3,5"
-            className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-2 text-sm text-ink-900 outline-none focus:border-brand-400"
+            className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-2 text-sm text-ink-900 outline-hidden focus:border-brand-400"
           />
           <p className="mt-1 text-xs text-ink-500">
             Kosongkan untuk mengambil semua halaman.
@@ -378,7 +378,7 @@ export default function Converter({
             value={watermarkText}
             onChange={(e) => setWatermarkText(e.target.value)}
             placeholder="contoh: © Nama Kamu"
-            className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-2 text-sm text-ink-900 outline-none focus:border-brand-400"
+            className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-2 text-sm text-ink-900 outline-hidden focus:border-brand-400"
           />
         </div>
       )}
@@ -504,7 +504,7 @@ export default function Converter({
                   </span>
                   <button
                     onClick={() => removeFile(i)}
-                    className="rounded text-ink-500 hover:text-red-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400"
+                    className="rounded-sm text-ink-500 hover:text-red-500 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-brand-400"
                     aria-label={`Hapus ${f.name}`}
                   >
                     ✕

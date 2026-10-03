@@ -1,43 +1,74 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap')
+layer(base);
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-:root {
-  --bg: #f6f8fc;
+@theme {
+  --color-brand-50: #eef4ff;
+  --color-brand-100: #d9e5ff;
+  --color-brand-500: #3b6cff;
+  --color-brand-600: #2a54e6;
+  --color-brand-700: #1f41b8;
+
+  --color-ink-500: #5a647a;
+  --color-ink-700: #2a3346;
+  --color-ink-900: #0b1020;
+
+  --font-sans: Inter, system-ui, sans-serif;
 }
 
-html {
-  scroll-behavior: smooth;
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
-body {
-  background:
-    radial-gradient(60rem 40rem at 80% -10%, #e8efff 0%, transparent 60%),
-    radial-gradient(50rem 35rem at -10% 10%, #eef4ff 0%, transparent 55%),
-    var(--bg);
-  color: #0b1020;
-  -webkit-font-smoothing: antialiased;
+@utility container-tight {
+  @apply mx-auto w-full max-w-5xl px-5;
+}
+
+@utility prose-page {
+  & h2 {
+    @apply mt-8 text-lg font-semibold text-ink-900;
+  }
+  & p {
+    @apply leading-relaxed;
+  }
+  & ul {
+    @apply list-disc space-y-1 pl-5;
+  }
+  & a {
+    @apply text-brand-700 underline hover:text-brand-600;
+  }
 }
 
 @layer utilities {
-  .container-tight {
-    @apply mx-auto w-full max-w-5xl px-5;
+  :root {
+    --bg: #f6f8fc;
   }
-}
 
-@layer components {
-  .prose-page h2 {
-    @apply mt-8 text-lg font-semibold text-ink-900;
+  html {
+    scroll-behavior: smooth;
   }
-  .prose-page p {
-    @apply leading-relaxed;
-  }
-  .prose-page ul {
-    @apply list-disc space-y-1 pl-5;
-  }
-  .prose-page a {
-    @apply text-brand-700 underline hover:text-brand-600;
+
+  body {
+    background:
+      radial-gradient(60rem 40rem at 80% -10%, #e8efff 0%, transparent 60%),
+      radial-gradient(50rem 35rem at -10% 10%, #eef4ff 0%, transparent 55%),
+      var(--bg);
+    color: #0b1020;
+    -webkit-font-smoothing: antialiased;
   }
 }
