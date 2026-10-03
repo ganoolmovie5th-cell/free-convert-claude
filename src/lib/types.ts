@@ -1,4 +1,11 @@
-export type ConvertKind = "image" | "data" | "pdf" | "pdfcompress";
+export type ConvertKind =
+  | "image"
+  | "data"
+  | "pdf"
+  | "pdfcompress"
+  | "pdf2img"
+  | "pdfmerge"
+  | "pdfsplit";
 
 export type TargetFormat =
   | "jpeg"
@@ -19,6 +26,9 @@ export const ACCEPT_BY_KIND: Record<ConvertKind, string> = {
   data: ".csv,.xlsx,.xls,text/csv",
   pdf: "image/jpeg,image/png,image/webp",
   pdfcompress: "application/pdf,.pdf",
+  pdf2img: "application/pdf,.pdf",
+  pdfmerge: "application/pdf,.pdf",
+  pdfsplit: "application/pdf,.pdf",
 };
 
 export const TARGETS_BY_KIND: Record<
@@ -37,6 +47,9 @@ export const TARGETS_BY_KIND: Record<
   ],
   pdf: [{ value: "pdf", label: "PDF (gabung)" }],
   pdfcompress: [{ value: "pdf", label: "PDF (kompres)" }],
+  pdf2img: [{ value: "jpeg", label: "JPG" }],
+  pdfmerge: [{ value: "pdf", label: "PDF" }],
+  pdfsplit: [{ value: "pdf", label: "PDF" }],
 };
 
 export function baseName(name: string): string {

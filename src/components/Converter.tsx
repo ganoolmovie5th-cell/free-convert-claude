@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ACCEPT_BY_KIND,
   ConvertKind,
@@ -12,21 +12,38 @@ import { convertImage } from "@/lib/image";
 import { convertData } from "@/lib/data";
 import { imagesToPdf } from "@/lib/pdf";
 import { compressPdf } from "@/lib/pdfCompress";
-import { downloadAll, downloadBlob } from "@/lib/download";
+import { pdfToImages } from "@/lib/pdfToImages";
+import { mergePdf, splitPdf } from "@/lib/pdfOps";
+import { downloadAll } from "@/lib/download";
+import {
+  addHistory,
+  clearHistory,
+  HistoryItem,
+  loadHistory,
+} from "@/lib/history";
 
 const KINDS: { value: ConvertKind; label: string; hint: string }[] = [
   { value: "image", label: "Gambar", hint: "JPG · PNG · WebP" },
   { value: "data", label: "Data", hint: "CSV · Excel · JSON" },
   { value: "pdf", label: "Gambar → PDF", hint: "Gabung jadi 1 PDF" },
   { value: "pdfcompress", label: "Kompres PDF", hint: "Perkecil ukuran" },
+  { value: "pdf2img", label: "PDF → JPG", hint: "Tiap halaman jadi gambar" },
+  { value: "pdfmerge", label: "Gabung PDF", hint: "Banyak PDF jadi 1" },
+  { value: "pdfsplit", label: "Pisah PDF", hint: "Ambil halaman tertentu" },
 ];
 
-// Resize presets for the image tab. 0 = original size.
-const RESIZE_PRESETS: { value: number; label: string }[] = [
+const RESIZE_PRESETS = [
   { value: 0, label: "Asli" },
   { value: 1920, label: "1920px" },
   { value: 1280, label: "1280px" },
   { value: 800, label: "800px" },
+];
+
+const ROTATE_PRESETS = [
+  { value: 0, label: "0°" },
+  { value: 90, label: "90°" },
+  { value: 180, label: "180°" },
+  { value: 270, label: "270°" },
 ];
 
 function fmtSize(bytes: number) {
@@ -35,22 +52,38 @@ function fmtSize(bytes: number) {
   return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
 }
 
-export default function Converter() {
-  const [kind, setKind] = useState<ConvertKind>("image");
-  const [target, setTarget] = useState<TargetFormat>("png");
+export default function Converter({
+  only,
+  lockTarget,
+}: {
+  only?: ConvertKind;
+  lockTarget?: string;
+}) {
+  const [kind, setKind] = useState<ConvertKind>(only ?? "image");
+  const [target, setTarget] = useState<TargetFormat>(
+    (lockTarget as TargetFormat) ?? "png",
+  );
   const [files, setFiles] = useState<File[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const [maxWidth, setMaxWidth] = useState(0);
+  const [rotate, setRotate] = useState(0);
   const [quality, setQuality] = useState(0.8);
+  const [range, setRange] = useState("");
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const targets = TARGETS_BY_KIND[kind];
+  useEffect(() => {
+    setHistory(loadHistory());
+  }, []);
 
-  // PNG is lossless; quality has no effect. Show slider only where it matters.
+  const targets = TARGETS_BY_KIND[kind];
+  const showTargets = !lockTarget && kind === "image";
   const showQuality =
-    (kind === "image" && target !== "png") || kind === "pdfcompress";
+    (kind === "image" && target !== "png") ||
+    kind === "pdfcompress" ||
+    kind === "pdf2img";
 
   const selectKind = useCallback((k: ConvertKind) => {
     setKind(k);
@@ -76,64 +109,95 @@ export default function Converter() {
     setBusy(true);
     setError(null);
     try {
+      let results: ConvertResult[] = [];
+
       if (kind === "pdf") {
-        const res = await imagesToPdf(files);
-        downloadBlob(res.blob, res.filename);
+        results = [await imagesToPdf(files)];
+      } else if (kind === "pdfmerge") {
+        results = [await mergePdf(files)];
       } else {
-        const results: ConvertResult[] = [];
         for (const f of files) {
-          let res: ConvertResult;
           if (kind === "image") {
-            res = await convertImage(f, target, { maxWidth, quality });
+            results.push(await convertImage(f, target, { maxWidth, quality, rotate }));
           } else if (kind === "pdfcompress") {
-            res = await compressPdf(f, { quality });
+            results.push(await compressPdf(f, { quality }));
+          } else if (kind === "pdf2img") {
+            results.push(...(await pdfToImages(f, quality)));
+          } else if (kind === "pdfsplit") {
+            results.push(await splitPdf(f, range));
           } else {
-            res = await convertData(f, target);
+            results.push(await convertData(f, target));
           }
-          results.push(res);
         }
-        downloadAll(results);
       }
+
+      downloadAll(results);
+      setHistory(
+        addHistory(
+          results.map((r) => ({
+            id: `${Date.now()}-${r.filename}`,
+            filename: r.filename,
+            size: r.blob.size,
+            at: Date.now(),
+          })),
+        ),
+      );
     } catch (e) {
       setError(e instanceof Error ? e.message : "Terjadi kesalahan.");
     } finally {
       setBusy(false);
     }
-  }, [files, kind, target, maxWidth, quality]);
+  }, [files, kind, target, maxWidth, quality, rotate, range]);
 
   const totalSize = useMemo(
     () => files.reduce((s, f) => s + f.size, 0),
     [files],
   );
 
+  const actionLabel = busy
+    ? "Memproses…"
+    : kind === "pdf"
+      ? "Gabungkan jadi PDF"
+      : kind === "pdfmerge"
+        ? "Gabung PDF"
+        : kind === "pdfsplit"
+          ? "Pisah & Unduh"
+          : kind === "pdfcompress"
+            ? "Kompres & Unduh"
+            : kind === "pdf2img"
+              ? "Ubah ke JPG"
+              : "Konversi & Unduh";
+
   return (
     <div className="rounded-2xl border border-black/5 bg-white/80 p-5 shadow-xl shadow-brand-500/5 backdrop-blur sm:p-7">
-      {/* Kind tabs */}
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {KINDS.map((k) => {
-          const active = k.value === kind;
-          return (
-            <button
-              key={k.value}
-              onClick={() => selectKind(k.value)}
-              className={`rounded-xl border px-3 py-3 text-left transition ${
-                active
-                  ? "border-brand-500 bg-brand-50"
-                  : "border-black/5 bg-white hover:border-brand-100"
-              }`}
-            >
-              <div className="text-sm font-semibold text-ink-900">
-                {k.label}
-              </div>
-              <div className="text-xs text-ink-500">{k.hint}</div>
-            </button>
-          );
-        })}
-      </div>
+      {/* Kind tabs — hidden when locked to a single tool */}
+      {!only && (
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {KINDS.map((k) => {
+            const active = k.value === kind;
+            return (
+              <button
+                key={k.value}
+                onClick={() => selectKind(k.value)}
+                className={`rounded-xl border px-3 py-3 text-left transition ${
+                  active
+                    ? "border-brand-500 bg-brand-50"
+                    : "border-black/5 bg-white hover:border-brand-100"
+                }`}
+              >
+                <div className="text-sm font-semibold text-ink-900">
+                  {k.label}
+                </div>
+                <div className="text-xs text-ink-500">{k.hint}</div>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
-      {/* Target format */}
-      {kind !== "pdf" && kind !== "pdfcompress" && (
-        <div className="mt-5">
+      {/* Target format (image only, unlocked) */}
+      {showTargets && (
+        <div className={only ? "" : "mt-5"}>
           <label className="text-sm font-medium text-ink-700">
             Konversi ke
           </label>
@@ -155,27 +219,67 @@ export default function Converter() {
         </div>
       )}
 
-      {/* Resize (image only) */}
+      {/* Resize + rotate (image only) */}
       {kind === "image" && (
-        <div className="mt-5">
-          <label className="text-sm font-medium text-ink-700">
-            Ubah ukuran (lebar maks)
-          </label>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {RESIZE_PRESETS.map((p) => (
-              <button
-                key={p.value}
-                onClick={() => setMaxWidth(p.value)}
-                className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
-                  maxWidth === p.value
-                    ? "border-brand-500 bg-brand-500 text-white"
-                    : "border-black/10 bg-white text-ink-700 hover:border-brand-300"
-                }`}
-              >
-                {p.label}
-              </button>
-            ))}
+        <>
+          <div className="mt-5">
+            <label className="text-sm font-medium text-ink-700">
+              Ubah ukuran (lebar maks)
+            </label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {RESIZE_PRESETS.map((p) => (
+                <button
+                  key={p.value}
+                  onClick={() => setMaxWidth(p.value)}
+                  className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                    maxWidth === p.value
+                      ? "border-brand-500 bg-brand-500 text-white"
+                      : "border-black/10 bg-white text-ink-700 hover:border-brand-300"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
           </div>
+          <div className="mt-5">
+            <label className="text-sm font-medium text-ink-700">Putar</label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {ROTATE_PRESETS.map((p) => (
+                <button
+                  key={p.value}
+                  onClick={() => setRotate(p.value)}
+                  className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                    rotate === p.value
+                      ? "border-brand-500 bg-brand-500 text-white"
+                      : "border-black/10 bg-white text-ink-700 hover:border-brand-300"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Split range */}
+      {kind === "pdfsplit" && (
+        <div className="mt-5">
+          <label htmlFor="range" className="text-sm font-medium text-ink-700">
+            Halaman yang diambil
+          </label>
+          <input
+            id="range"
+            type="text"
+            value={range}
+            onChange={(e) => setRange(e.target.value)}
+            placeholder="contoh: 1-3,5"
+            className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-2 text-sm text-ink-900 outline-none focus:border-brand-400"
+          />
+          <p className="mt-1 text-xs text-ink-500">
+            Kosongkan untuk mengambil semua halaman.
+          </p>
         </div>
       )}
 
@@ -183,7 +287,10 @@ export default function Converter() {
       {showQuality && (
         <div className="mt-5">
           <div className="flex items-center justify-between">
-            <label htmlFor="quality" className="text-sm font-medium text-ink-700">
+            <label
+              htmlFor="quality"
+              className="text-sm font-medium text-ink-700"
+            >
               Kualitas
             </label>
             <span className="text-sm font-semibold text-brand-700">
@@ -301,14 +408,34 @@ export default function Converter() {
         disabled={busy || files.length === 0}
         className="mt-5 w-full rounded-xl bg-brand-500 py-3.5 font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
       >
-        {busy
-          ? "Memproses…"
-          : kind === "pdf"
-            ? "Gabungkan jadi PDF"
-            : kind === "pdfcompress"
-              ? "Kompres & Unduh"
-              : "Konversi & Unduh"}
+        {actionLabel}
       </button>
+
+      {/* Recent history */}
+      {history.length > 0 && (
+        <div className="mt-6 border-t border-black/5 pt-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-medium text-ink-700">Riwayat</h3>
+            <button
+              onClick={() => {
+                clearHistory();
+                setHistory([]);
+              }}
+              className="text-xs text-ink-500 underline hover:text-ink-700"
+            >
+              Bersihkan
+            </button>
+          </div>
+          <ul className="mt-2 space-y-1 text-xs text-ink-500">
+            {history.slice(0, 6).map((h) => (
+              <li key={h.id} className="flex justify-between gap-3">
+                <span className="truncate">{h.filename}</span>
+                <span className="shrink-0">{fmtSize(h.size)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

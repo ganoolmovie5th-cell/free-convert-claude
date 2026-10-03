@@ -22,6 +22,8 @@ export interface ImageOptions {
   // Downscale so width does not exceed maxWidth (keeps aspect ratio).
   // 0 or undefined = keep original size.
   maxWidth?: number;
+  // Clockwise rotation in degrees: 0, 90, 180, or 270.
+  rotate?: number;
 }
 
 export async function convertImage(
@@ -29,7 +31,7 @@ export async function convertImage(
   target: TargetFormat,
   opts: ImageOptions = {},
 ): Promise<ConvertResult> {
-  const { quality = 0.85, maxWidth = 0 } = opts;
+  const { quality = 0.85, maxWidth = 0, rotate = 0 } = opts;
   const mime = MIME[target];
   if (!mime) throw new Error("Format gambar tidak didukung: " + target);
 
@@ -42,9 +44,12 @@ export async function convertImage(
     w = maxWidth;
   }
 
+  const deg = ((rotate % 360) + 360) % 360;
+  const swap = deg === 90 || deg === 270;
+
   const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = swap ? h : w;
+  canvas.height = swap ? w : h;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("Canvas tidak tersedia di browser ini.");
 
@@ -53,7 +58,11 @@ export async function convertImage(
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
-  ctx.drawImage(bitmap, 0, 0, w, h);
+
+  // Rotate around the canvas center, then draw the scaled image centered.
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.rotate((deg * Math.PI) / 180);
+  ctx.drawImage(bitmap, -w / 2, -h / 2, w, h);
   bitmap.close();
 
   const blob = await new Promise<Blob | null>((resolve) =>

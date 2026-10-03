@@ -1,6 +1,8 @@
+import Link from "next/link";
 import Converter from "@/components/Converter";
 import AdSlot from "@/components/AdSlot";
 import SiteFooter from "@/components/SiteFooter";
+import { TOOLS } from "@/lib/tools";
 
 const FEATURES = [
   {
@@ -72,6 +74,25 @@ export default function Home() {
       {/* Ad slot (top) */}
       <section className="container-tight mt-14">
         <AdSlot label="Ruang iklan" />
+      </section>
+
+      {/* All tools */}
+      <section className="container-tight mt-16">
+        <h2 className="text-center text-2xl font-bold text-ink-900">
+          Semua alat
+        </h2>
+        <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {TOOLS.map((t) => (
+            <Link
+              key={t.slug}
+              href={`/${t.slug}`}
+              className="rounded-xl border border-black/5 bg-white/70 p-4 transition hover:border-brand-300"
+            >
+              <div className="text-sm font-semibold text-ink-900">{t.nav}</div>
+              <div className="mt-1 text-xs text-ink-500">{t.title}</div>
+            </Link>
+          ))}
+        </div>
       </section>
 
       {/* Features */}
