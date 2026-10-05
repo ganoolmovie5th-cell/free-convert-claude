@@ -31,20 +31,20 @@ export interface ConvertResult {
 }
 
 export const ACCEPT_BY_KIND: Record<ConvertKind, string> = {
-  image: "image/jpeg,image/png,image/webp",
+  image: "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp",
   data: ".csv,.xlsx,.xls,text/csv",
-  pdf: "image/jpeg,image/png,image/webp",
+  pdf: "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp",
   pdfcompress: "application/pdf,.pdf",
   pdf2img: "application/pdf,.pdf",
   pdfmerge: "application/pdf,.pdf",
   pdfsplit: "application/pdf,.pdf",
-  watermark: "image/jpeg,image/png,image/webp",
+  watermark: "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp",
   pdfunlock: "application/pdf,.pdf",
-  crop: "image/jpeg,image/png,image/webp",
-  imgmerge: "image/jpeg,image/png,image/webp",
+  crop: "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp",
+  imgmerge: "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp",
   pdf2png: "application/pdf,.pdf",
   pdftext: "application/pdf,.pdf",
-  ocr: "image/jpeg,image/png,image/webp",
+  ocr: "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp",
   qr: "",
   base64: "",
 };
