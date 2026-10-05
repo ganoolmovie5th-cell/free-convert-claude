@@ -90,8 +90,8 @@ function FileThumb({ file }: { file: File }) {
         {file.name.split(".").pop()?.slice(0, 4).toUpperCase() || "FILE"}
       </span>
     );
-  // eslint-disable-next-line @next/next/no-img-element
   return (
+    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={url}
       alt=""

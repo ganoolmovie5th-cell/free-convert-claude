@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import PageShell from "@/components/PageShell";
 
 export const metadata: Metadata = {
@@ -56,7 +57,7 @@ export default function Privasi() {
       <h2>Kontak</h2>
       <p>
         Pertanyaan soal privasi bisa dikirim ke halaman{" "}
-        <a href="/kontak">Kontak</a>.
+        <Link href="/kontak">Kontak</Link>.
       </p>
     </PageShell>
   );
