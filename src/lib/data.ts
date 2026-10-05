@@ -1,16 +1,18 @@
-import * as XLSX from "xlsx";
 import { baseName, ConvertResult, TargetFormat } from "./types";
 
-async function readWorkbook(file: File): Promise<XLSX.WorkBook> {
+// xlsx is ~1.4MB. Load it only when a data conversion actually runs, so the
+// 15+ other tools that import Converter don't pay for it.
+async function readWorkbook(file: File) {
+  const XLSX = await import("xlsx");
   const buf = await file.arrayBuffer();
-  return XLSX.read(buf, { type: "array" });
+  return { XLSX, wb: XLSX.read(buf, { type: "array" }) };
 }
 
 export async function convertData(
   file: File,
   target: TargetFormat,
 ): Promise<ConvertResult> {
-  const wb = await readWorkbook(file);
+  const { XLSX, wb } = await readWorkbook(file);
   const first = wb.SheetNames[0];
   const sheet = wb.Sheets[first];
   const name = baseName(file.name);
