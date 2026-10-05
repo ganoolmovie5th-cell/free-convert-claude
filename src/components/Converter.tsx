@@ -17,6 +17,9 @@ import { pdfToImages } from "@/lib/pdfToImages";
 import { mergePdf, splitPdf } from "@/lib/pdfOps";
 import { watermarkImage } from "@/lib/watermark";
 import { unlockPdf } from "@/lib/pdfUnlock";
+import { cropImage } from "@/lib/cropImage";
+import { mergeImages, MergeLayout } from "@/lib/mergeImages";
+import { addTextToPdf, TextPosition } from "@/lib/pdfText";
 import { downloadAll } from "@/lib/download";
 import {
   addHistory,
@@ -35,6 +38,17 @@ const KINDS: { value: ConvertKind; label: string; hint: string }[] = [
   { value: "pdfsplit", label: "Pisah PDF", hint: "Ambil halaman tertentu" },
   { value: "watermark", label: "Watermark", hint: "Teks di atas gambar" },
   { value: "pdfunlock", label: "Buka Proteksi", hint: "Hapus pembatasan PDF" },
+  { value: "crop", label: "Crop Gambar", hint: "Potong ke rasio" },
+  { value: "imgmerge", label: "Gabung Gambar", hint: "Tumpuk jadi satu" },
+  { value: "pdf2png", label: "PDF → PNG", hint: "Tiap halaman jadi PNG" },
+  { value: "pdftext", label: "Teks ke PDF", hint: "Stempel teks" },
+];
+
+const CROP_RATIOS = [
+  { value: 0, label: "Asli" },
+  { value: 1, label: "1:1" },
+  { value: 16 / 9, label: "16:9" },
+  { value: 4 / 3, label: "4:3" },
 ];
 
 // Warn (not block) above this total; huge files can hang the browser tab.
@@ -106,6 +120,10 @@ export default function Converter({
   const [quality, setQuality] = useState(0.8);
   const [range, setRange] = useState("");
   const [watermarkText, setWatermarkText] = useState("");
+  const [cropRatio, setCropRatio] = useState(0);
+  const [imgLayout, setImgLayout] = useState<MergeLayout>("vertical");
+  const [pdfText, setPdfText] = useState("");
+  const [pdfTextPos, setPdfTextPos] = useState<TextPosition>("bottom");
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [summary, setSummary] = useState<{
@@ -125,7 +143,10 @@ export default function Converter({
     (kind === "image" && target !== "png") ||
     kind === "pdfcompress" ||
     kind === "pdf2img" ||
-    kind === "watermark";
+    kind === "pdf2png" ||
+    kind === "watermark" ||
+    kind === "crop" ||
+    kind === "imgmerge";
 
   const selectKind = useCallback((k: ConvertKind) => {
     setKind(k);
@@ -175,6 +196,10 @@ export default function Converter({
         setProgress({ done: 0, total: 1 });
         results = [await mergePdf(files)];
         setProgress({ done: 1, total: 1 });
+      } else if (kind === "imgmerge") {
+        setProgress({ done: 0, total: 1 });
+        results = [await mergeImages(files, imgLayout, quality)];
+        setProgress({ done: 1, total: 1 });
       } else {
         setProgress({ done: 0, total: files.length });
         for (let i = 0; i < files.length; i++) {
@@ -188,9 +213,21 @@ export default function Converter({
           } else if (kind === "pdfunlock") {
             results.push(await unlockPdf(f));
           } else if (kind === "pdf2img") {
-            results.push(...(await pdfToImages(f, quality)));
+            results.push(...(await pdfToImages(f, quality, "jpeg")));
+          } else if (kind === "pdf2png") {
+            results.push(...(await pdfToImages(f, quality, "png")));
           } else if (kind === "pdfsplit") {
             results.push(await splitPdf(f, range));
+          } else if (kind === "pdftext") {
+            results.push(
+              await addTextToPdf(f, {
+                text: pdfText,
+                position: pdfTextPos,
+                allPages: false,
+              }),
+            );
+          } else if (kind === "crop") {
+            results.push(await cropImage(f, cropRatio, quality));
           } else {
             results.push(await convertData(f, target));
           }
@@ -219,7 +256,20 @@ export default function Converter({
     } finally {
       setBusy(false);
     }
-  }, [files, kind, target, maxWidth, quality, rotate, range, watermarkText]);
+  }, [
+    files,
+    kind,
+    target,
+    maxWidth,
+    quality,
+    rotate,
+    range,
+    watermarkText,
+    cropRatio,
+    imgLayout,
+    pdfText,
+    pdfTextPos,
+  ]);
 
   const totalSize = useMemo(
     () => files.reduce((s, f) => s + f.size, 0),
@@ -240,11 +290,19 @@ export default function Converter({
             ? "Kompres & Unduh"
             : kind === "pdf2img"
               ? "Ubah ke JPG"
-              : kind === "watermark"
-                ? "Tambah Watermark"
-                : kind === "pdfunlock"
-                  ? "Hapus Proteksi"
-                  : "Konversi & Unduh";
+              : kind === "pdf2png"
+                ? "Ubah ke PNG"
+                : kind === "watermark"
+                  ? "Tambah Watermark"
+                  : kind === "pdfunlock"
+                    ? "Hapus Proteksi"
+                    : kind === "crop"
+                      ? "Crop & Unduh"
+                      : kind === "imgmerge"
+                        ? "Gabung & Unduh"
+                        : kind === "pdftext"
+                          ? "Tambah Teks & Unduh"
+                          : "Konversi & Unduh";
 
   const overSizeWarn = totalSize > SIZE_WARN;
 
@@ -380,6 +438,101 @@ export default function Converter({
             placeholder="contoh: © Nama Kamu"
             className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-2 text-sm text-ink-900 outline-hidden focus:border-brand-400"
           />
+        </div>
+      )}
+
+      {/* Crop ratio */}
+      {kind === "crop" && (
+        <div className="mt-5">
+          <label className="text-sm font-medium text-ink-700">Rasio potong</label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {CROP_RATIOS.map((r) => (
+              <button
+                key={r.label}
+                onClick={() => setCropRatio(r.value)}
+                className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                  cropRatio === r.value
+                    ? "border-brand-500 bg-brand-500 text-white"
+                    : "border-black/10 bg-white text-ink-700 hover:border-brand-300"
+                }`}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+          <p className="mt-1 text-xs text-ink-500">
+            Dipotong dari tengah ke rasio yang dipilih.
+          </p>
+        </div>
+      )}
+
+      {/* Image merge layout */}
+      {kind === "imgmerge" && (
+        <div className="mt-5">
+          <label className="text-sm font-medium text-ink-700">Susunan</label>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {(
+              [
+                { v: "vertical", l: "Vertikal" },
+                { v: "horizontal", l: "Horizontal" },
+              ] as const
+            ).map((o) => (
+              <button
+                key={o.v}
+                onClick={() => setImgLayout(o.v)}
+                className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                  imgLayout === o.v
+                    ? "border-brand-500 bg-brand-500 text-white"
+                    : "border-black/10 bg-white text-ink-700 hover:border-brand-300"
+                }`}
+              >
+                {o.l}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* PDF add-text */}
+      {kind === "pdftext" && (
+        <div className="mt-5 space-y-4">
+          <div>
+            <label htmlFor="pdftext" className="text-sm font-medium text-ink-700">
+              Teks
+            </label>
+            <input
+              id="pdftext"
+              type="text"
+              value={pdfText}
+              onChange={(e) => setPdfText(e.target.value)}
+              placeholder="contoh: RAHASIA"
+              className="mt-2 w-full rounded-lg border border-black/10 bg-white px-4 py-2 text-sm text-ink-900 outline-hidden focus:border-brand-400"
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium text-ink-700">Posisi</label>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {(
+                [
+                  { v: "top", l: "Atas" },
+                  { v: "center", l: "Tengah" },
+                  { v: "bottom", l: "Bawah" },
+                ] as const
+              ).map((o) => (
+                <button
+                  key={o.v}
+                  onClick={() => setPdfTextPos(o.v)}
+                  className={`rounded-lg border px-4 py-2 text-sm font-medium transition ${
+                    pdfTextPos === o.v
+                      ? "border-brand-500 bg-brand-500 text-white"
+                      : "border-black/10 bg-white text-ink-700 hover:border-brand-300"
+                  }`}
+                >
+                  {o.l}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

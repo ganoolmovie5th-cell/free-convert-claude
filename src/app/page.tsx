@@ -3,6 +3,7 @@ import Converter from "@/components/Converter";
 import AdSlot from "@/components/AdSlot";
 import SiteFooter from "@/components/SiteFooter";
 import JsonLd from "@/components/JsonLd";
+import ThemeToggle from "@/components/ThemeToggle";
 import { TOOLS } from "@/lib/tools";
 
 const FEATURES = [
@@ -46,6 +47,7 @@ export default function Home() {
           </span>
           <span className="font-bold text-ink-900">Free Convert</span>
         </div>
+        <ThemeToggle />
       </header>
 
       {/* Hero + converter */}

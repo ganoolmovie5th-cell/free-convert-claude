@@ -14,16 +14,24 @@ Live: https://free-convert.web.id
 - PDF → JPG (tiap halaman jadi gambar)
 - Gabung PDF (beberapa PDF jadi satu, isi dokumen tetap utuh)
 - Pisah PDF (ambil halaman tertentu, misal 1-3,5)
+- PDF → PNG (tiap halaman jadi PNG)
 - Putar gambar (90/180/270°)
+- Crop gambar (potong ke rasio 1:1/16:9/4:3)
+- Gabung gambar jadi satu (vertikal/horizontal)
 - Watermark gambar (teks diagonal berulang)
+- Tambah teks ke PDF (stempel posisi preset)
 - Hapus proteksi PDF (pembatasan copy/print/edit — bukan password buka)
+- OCR: ekstrak teks dari gambar (tesseract.js, Indonesia + Inggris)
+- Buat QR code dari teks/URL
+- Encode/decode Base64
 - Slider kualitas untuk gambar (JPG/WebP), kompres PDF, PDF → JPG, watermark
 - Batch (beberapa file sekaligus); hasil banyak file otomatis jadi satu ZIP
 - Progres per-file + peringatan ukuran besar
 - Riwayat lokal konversi terakhir (disimpan di browser)
 - Preview thumbnail gambar sebelum konversi
+- Mode gelap (tersimpan di browser)
 - Halaman alat terpisah per fungsi + FAQ untuk SEO (mis. /kompres-gambar)
-- Structured data (JSON-LD) untuk hasil pencarian yang lebih kaya
+- Blog panduan + breadcrumb + structured data (JSON-LD) untuk SEO
 - Semua diproses di browser — file tidak dikirim ke server
 
 Konversi dokumen Office (Word/Excel/PowerPoint → PDF) butuh pemrosesan di

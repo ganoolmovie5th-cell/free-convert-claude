@@ -1,14 +1,16 @@
 import type { MetadataRoute } from "next";
 import { TOOLS } from "@/lib/tools";
+import { POSTS } from "@/lib/posts";
 
 const BASE = "https://www.free-convert.web.id";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
-  const staticPaths = ["", "/tentang", "/privasi", "/kontak"];
+  const staticPaths = ["", "/blog", "/tentang", "/privasi", "/kontak"];
   const toolPaths = TOOLS.map((t) => `/${t.slug}`);
+  const postPaths = POSTS.map((p) => `/blog/${p.slug}`);
 
-  return [...staticPaths, ...toolPaths].map((p) => ({
+  return [...staticPaths, ...toolPaths, ...postPaths].map((p) => ({
     url: `${BASE}${p}`,
     lastModified: now,
     changeFrequency: p === "" ? "weekly" : "monthly",

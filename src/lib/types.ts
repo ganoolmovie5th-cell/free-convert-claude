@@ -7,7 +7,14 @@ export type ConvertKind =
   | "pdfmerge"
   | "pdfsplit"
   | "watermark"
-  | "pdfunlock";
+  | "pdfunlock"
+  | "crop"
+  | "imgmerge"
+  | "pdf2png"
+  | "pdftext"
+  | "ocr"
+  | "qr"
+  | "base64";
 
 export type TargetFormat =
   | "jpeg"
@@ -33,6 +40,13 @@ export const ACCEPT_BY_KIND: Record<ConvertKind, string> = {
   pdfsplit: "application/pdf,.pdf",
   watermark: "image/jpeg,image/png,image/webp",
   pdfunlock: "application/pdf,.pdf",
+  crop: "image/jpeg,image/png,image/webp",
+  imgmerge: "image/jpeg,image/png,image/webp",
+  pdf2png: "application/pdf,.pdf",
+  pdftext: "application/pdf,.pdf",
+  ocr: "image/jpeg,image/png,image/webp",
+  qr: "",
+  base64: "",
 };
 
 export const TARGETS_BY_KIND: Record<
@@ -56,6 +70,13 @@ export const TARGETS_BY_KIND: Record<
   pdfsplit: [{ value: "pdf", label: "PDF" }],
   watermark: [{ value: "jpeg", label: "JPG" }],
   pdfunlock: [{ value: "pdf", label: "PDF" }],
+  crop: [{ value: "jpeg", label: "JPG" }],
+  imgmerge: [{ value: "jpeg", label: "JPG" }],
+  pdf2png: [{ value: "png", label: "PNG" }],
+  pdftext: [{ value: "pdf", label: "PDF" }],
+  ocr: [{ value: "json", label: "Teks" }],
+  qr: [{ value: "png", label: "PNG" }],
+  base64: [{ value: "json", label: "Teks" }],
 };
 
 export function baseName(name: string): string {

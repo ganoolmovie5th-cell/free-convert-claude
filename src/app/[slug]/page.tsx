@@ -2,8 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import Converter from "@/components/Converter";
+import TextTool from "@/components/TextTool";
+import OcrTool from "@/components/OcrTool";
 import SiteFooter from "@/components/SiteFooter";
 import JsonLd from "@/components/JsonLd";
+import ThemeToggle from "@/components/ThemeToggle";
+import Breadcrumb from "@/components/Breadcrumb";
 import { TOOLS, toolBySlug } from "@/lib/tools";
 
 export function generateStaticParams() {
@@ -56,17 +60,26 @@ export default async function ToolPage({
           </span>
           <span className="font-bold text-ink-900">Free Convert</span>
         </Link>
-        <Link
-          href="/"
-          className="rounded-lg border border-black/10 bg-white px-4 py-2 text-sm font-medium text-ink-700 hover:border-brand-300"
-        >
-          Semua Alat
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/"
+            className="rounded-lg border border-black/10 bg-white px-4 py-2 text-sm font-medium text-ink-700 hover:border-brand-300"
+          >
+            Semua Alat
+          </Link>
+          <ThemeToggle />
+        </div>
       </header>
 
       <section className="container-tight mt-6 grid gap-10 lg:grid-cols-2 lg:items-start lg:gap-12">
         <div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-ink-900 sm:text-4xl">
+          <Breadcrumb
+            items={[
+              { name: "Beranda", href: "/" },
+              { name: tool.nav, href: `/${tool.slug}` },
+            ]}
+          />
+          <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-ink-900 sm:text-4xl">
             {tool.title}
           </h1>
           <p className="mt-4 max-w-md text-lg text-ink-500">
@@ -77,7 +90,15 @@ export default async function ToolPage({
           </p>
         </div>
 
-        <Converter only={tool.kind} lockTarget={tool.lockTarget} />
+        {tool.kind === "qr" ? (
+          <TextTool mode="qr" />
+        ) : tool.kind === "base64" ? (
+          <TextTool mode="base64" />
+        ) : tool.kind === "ocr" ? (
+          <OcrTool />
+        ) : (
+          <Converter only={tool.kind} lockTarget={tool.lockTarget} />
+        )}
       </section>
 
       {/* FAQ */}

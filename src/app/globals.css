@@ -3,6 +3,9 @@ layer(base);
 
 @import 'tailwindcss';
 
+/* Toggle dark mode via a `dark` class on <html>, not the OS setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-brand-50: #eef4ff;
   --color-brand-100: #d9e5ff;
@@ -35,6 +38,36 @@ layer(base);
   }
 }
 
+/*
+  Dark-mode surface + text remap. Rather than annotate every component with
+  dark: variants, remap the handful of utility classes the UI actually uses.
+  Scoped under .dark so light mode is untouched.
+*/
+.dark .bg-white,
+.dark .bg-white\/80,
+.dark .bg-white\/70,
+.dark .bg-white\/60,
+.dark .bg-white\/50 {
+  background-color: color-mix(in oklab, #1e293b 92%, transparent);
+}
+.dark .text-ink-900 {
+  color: #e5e9f2;
+}
+.dark .text-ink-700 {
+  color: #c2c9d6;
+}
+.dark .text-ink-500 {
+  color: #94a0b4;
+}
+.dark .border-black\/5,
+.dark .border-black\/10,
+.dark .border-black\/15 {
+  border-color: color-mix(in oklab, #ffffff 12%, transparent);
+}
+.dark .bg-brand-50 {
+  background-color: color-mix(in oklab, #3b6cff 22%, transparent);
+}
+
 @utility container-tight {
   @apply mx-auto w-full max-w-5xl px-5;
 }
@@ -57,6 +90,16 @@ layer(base);
 @layer utilities {
   :root {
     --bg: #f6f8fc;
+    --bg-glow-a: #e8efff;
+    --bg-glow-b: #eef4ff;
+    --fg: #0b1020;
+  }
+
+  .dark {
+    --bg: #0b1020;
+    --bg-glow-a: #16203c;
+    --bg-glow-b: #121a30;
+    --fg: #e5e9f2;
   }
 
   html {
@@ -65,10 +108,10 @@ layer(base);
 
   body {
     background:
-      radial-gradient(60rem 40rem at 80% -10%, #e8efff 0%, transparent 60%),
-      radial-gradient(50rem 35rem at -10% 10%, #eef4ff 0%, transparent 55%),
+      radial-gradient(60rem 40rem at 80% -10%, var(--bg-glow-a) 0%, transparent 60%),
+      radial-gradient(50rem 35rem at -10% 10%, var(--bg-glow-b) 0%, transparent 55%),
       var(--bg);
-    color: #0b1020;
+    color: var(--fg);
     -webkit-font-smoothing: antialiased;
   }
 }

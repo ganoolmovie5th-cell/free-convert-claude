@@ -203,6 +203,132 @@ export const TOOLS: Tool[] = [
       },
     ],
   },
+  {
+    slug: "crop-gambar",
+    kind: "crop",
+    nav: "Crop Gambar",
+    title: "Crop Gambar Online",
+    description:
+      "Potong gambar ke rasio 1:1, 16:9, atau 4:3 dari tengah. Diproses di browser, tanpa upload.",
+    faq: [
+      {
+        q: "Bisakah memilih area potong sendiri?",
+        a: "Saat ini pemotongan dilakukan dari tengah ke rasio yang dipilih. Pemotongan area bebas sedang dipertimbangkan.",
+      },
+      {
+        q: "Format hasilnya apa?",
+        a: "Hasil crop disimpan sebagai JPG dengan kualitas yang bisa kamu atur.",
+      },
+    ],
+  },
+  {
+    slug: "gabung-gambar",
+    kind: "imgmerge",
+    nav: "Gabung Gambar",
+    title: "Gabung Gambar jadi Satu",
+    description:
+      "Tumpuk beberapa gambar menjadi satu gambar, secara vertikal atau horizontal. Cocok untuk menggabung screenshot.",
+    faq: [
+      {
+        q: "Bagaimana urutan gambarnya?",
+        a: "Gambar disusun sesuai urutan ditambahkan. Hapus dan tambahkan ulang untuk mengatur urutan.",
+      },
+      {
+        q: "Apakah ukuran gambar harus sama?",
+        a: "Tidak. Gambar otomatis diseragamkan lebarnya (vertikal) atau tingginya (horizontal) saat digabung.",
+      },
+    ],
+  },
+  {
+    slug: "pdf-ke-png",
+    kind: "pdf2png",
+    nav: "PDF ke PNG",
+    title: "Konversi PDF ke PNG",
+    description:
+      "Ubah setiap halaman PDF menjadi gambar PNG. Diproses di browser, tanpa upload ke server.",
+    faq: [
+      {
+        q: "Apa bedanya dengan PDF ke JPG?",
+        a: "PNG bersifat lossless dan mendukung ketajaman garis lebih baik, tetapi ukurannya umumnya lebih besar dari JPG.",
+      },
+      {
+        q: "Apakah tiap halaman jadi file terpisah?",
+        a: "Ya. Jika ada beberapa halaman, hasilnya diunduh sebagai satu file ZIP.",
+      },
+    ],
+  },
+  {
+    slug: "tambah-teks-pdf",
+    kind: "pdftext",
+    nav: "Teks ke PDF",
+    title: "Tambah Teks ke PDF",
+    description:
+      "Stempel satu baris teks ke PDF di posisi atas, tengah, atau bawah. Cocok untuk menandai dokumen.",
+    faq: [
+      {
+        q: "Bisakah menaruh teks di posisi bebas?",
+        a: "Saat ini teks ditempatkan di posisi preset (atas, tengah, bawah) dan di halaman pertama. Ini stempel sederhana, bukan editor penuh.",
+      },
+      {
+        q: "Apakah teks bisa dihapus lagi?",
+        a: "Teks menyatu dengan PDF hasil. Simpan file asli jika masih kamu butuhkan tanpa teks.",
+      },
+    ],
+  },
+  {
+    slug: "ocr-gambar",
+    kind: "ocr",
+    nav: "OCR Gambar",
+    title: "Ekstrak Teks dari Gambar (OCR)",
+    description:
+      "Baca teks dari gambar atau hasil scan menjadi teks yang bisa disalin. Mendukung bahasa Indonesia dan Inggris, diproses di browser.",
+    faq: [
+      {
+        q: "Kenapa proses OCR agak lama?",
+        a: "Mesin OCR dan data bahasa dimuat sekali di awal, lalu memproses gambar di perangkat kamu. Gambar yang jelas dan kontras tinggi memberi hasil terbaik.",
+      },
+      {
+        q: "Apakah gambar saya dikirim ke server?",
+        a: "Tidak. OCR berjalan sepenuhnya di browser kamu.",
+      },
+    ],
+  },
+  {
+    slug: "qr-code",
+    kind: "qr",
+    nav: "Buat QR Code",
+    title: "Buat QR Code Online",
+    description:
+      "Buat QR code dari teks atau URL, lalu unduh sebagai PNG. Gratis dan langsung di browser.",
+    faq: [
+      {
+        q: "Apakah QR code ini kedaluwarsa?",
+        a: "Tidak. QR code statis yang dibuat di sini tidak kedaluwarsa dan tidak melacak siapa pun.",
+      },
+      {
+        q: "Apa yang bisa dimasukkan ke QR?",
+        a: "Teks apa pun, termasuk URL, nomor telepon, atau pesan singkat.",
+      },
+    ],
+  },
+  {
+    slug: "base64",
+    kind: "base64",
+    nav: "Base64",
+    title: "Encode & Decode Base64",
+    description:
+      "Ubah teks menjadi base64 atau sebaliknya. Mendukung karakter non-Latin dengan aman, diproses di browser.",
+    faq: [
+      {
+        q: "Apa itu base64?",
+        a: "Base64 adalah cara mengkodekan data menjadi teks ASCII, sering dipakai untuk menyisipkan data di URL, email, atau konfigurasi.",
+      },
+      {
+        q: "Apakah base64 itu enkripsi?",
+        a: "Bukan. Base64 hanya pengkodean, bukan enkripsi. Siapa pun bisa mendekodenya kembali.",
+      },
+    ],
+  },
 ];
 
 export function toolBySlug(slug: string): Tool | undefined {
