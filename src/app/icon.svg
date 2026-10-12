@@ -1,4 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="14" fill="#3b6cff"/>
-  <text x="32" y="43" font-family="Inter, system-ui, Arial, sans-serif" font-size="30" font-weight="800" fill="#ffffff" text-anchor="middle">FC</text>
+  <g transform="translate(0,-1)">
+    <path d="M23 16 h12 l8 8 v22 a2 2 0 0 1 -2 2 H23 a2 2 0 0 1 -2 -2 V18 a2 2 0 0 1 2 -2 z" fill="#ffffff"/>
+    <path d="M35 16 v8 h8" fill="none" stroke="#3b6cff" stroke-width="2.5" stroke-linejoin="round"/>
+    <path d="M27 34 h8 v-3 l5 4.5 -5 4.5 v-3 h-8 z" fill="#3b6cff"/>
+    <path d="M37 42 h-8 v3 l-5 -4.5 5 -4.5 v3 h8 z" fill="#9db8ff"/>
+  </g>
 </svg>
