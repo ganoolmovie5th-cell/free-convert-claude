@@ -24,6 +24,14 @@ const FEATURES = [
 
 const SOON = ["Word → PDF", "Excel → PDF", "PDF → Word", "PowerPoint → PDF"];
 
+const orgSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "Free Convert",
+  url: "https://www.free-convert.web.id",
+  logo: "https://www.free-convert.web.id/logo-512.png",
+};
+
 const appSchema = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
@@ -39,6 +47,7 @@ const appSchema = {
 export default function Home() {
   return (
     <main className="min-h-screen pb-24">
+      <JsonLd data={orgSchema} />
       <JsonLd data={appSchema} />
       {/* Nav */}
       <header className="container-tight flex items-center justify-between py-5">
