@@ -4,6 +4,7 @@ import AdSlot from "@/components/AdSlot";
 import SiteFooter from "@/components/SiteFooter";
 import JsonLd from "@/components/JsonLd";
 import ThemeToggle from "@/components/ThemeToggle";
+import BrandMark from "@/components/BrandMark";
 import { TOOLS } from "@/lib/tools";
 
 const FEATURES = [
@@ -42,9 +43,7 @@ export default function Home() {
       {/* Nav */}
       <header className="container-tight flex items-center justify-between py-5">
         <div className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-sm font-bold text-white">
-            FC
-          </span>
+          <BrandMark />
           <span className="font-bold text-ink-900">Free Convert</span>
         </div>
         <ThemeToggle />

@@ -8,6 +8,7 @@ import SiteFooter from "@/components/SiteFooter";
 import JsonLd from "@/components/JsonLd";
 import ThemeToggle from "@/components/ThemeToggle";
 import Breadcrumb from "@/components/Breadcrumb";
+import BrandMark from "@/components/BrandMark";
 import { TOOLS, toolBySlug } from "@/lib/tools";
 
 export function generateStaticParams() {
@@ -55,9 +56,7 @@ export default async function ToolPage({
       <JsonLd data={faqSchema} />
       <header className="container-tight flex items-center justify-between py-5">
         <Link href="/" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-sm font-bold text-white">
-            FC
-          </span>
+          <BrandMark />
           <span className="font-bold text-ink-900">Free Convert</span>
         </Link>
         <div className="flex items-center gap-2">

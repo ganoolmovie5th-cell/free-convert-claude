@@ -25,7 +25,7 @@ export default function OgImage() {
               width: 72,
               height: 72,
               borderRadius: 18,
-              background: "#3b6cff",
+              background: "#2563eb",
               color: "#fff",
               fontSize: 36,
               fontWeight: 800,
@@ -52,7 +52,7 @@ export default function OgImage() {
           Konversi & kompres file,
         </div>
         <div
-          style={{ fontSize: 64, fontWeight: 800, color: "#3b6cff", lineHeight: 1.1 }}
+          style={{ fontSize: 64, fontWeight: 800, color: "#2563eb", lineHeight: 1.1 }}
         >
           langsung di browser.
         </div>

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SiteFooter from "./SiteFooter";
+import BrandMark from "./BrandMark";
 
 export default function PageShell({
   title,
@@ -12,9 +13,7 @@ export default function PageShell({
     <main className="min-h-screen pb-16">
       <header className="container-tight flex items-center justify-between py-5">
         <Link href="/" className="flex items-center gap-2">
-          <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-500 text-sm font-bold text-white">
-            FC
-          </span>
+          <BrandMark />
           <span className="font-bold text-ink-900">Free Convert</span>
         </Link>
         <Link
