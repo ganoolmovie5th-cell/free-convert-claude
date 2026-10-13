@@ -30,16 +30,6 @@ const orgSchema = {
   name: "Free Convert",
   url: "https://www.free-convert.web.id",
   logo: "https://www.free-convert.web.id/logo-512.png",
-};
-
-const appSchema = {
-  "@context": "https://schema.org",
-  "@type": "WebApplication",
-  name: "Free Convert",
-  url: "https://www.free-convert.web.id",
-  applicationCategory: "UtilitiesApplication",
-  operatingSystem: "Web",
-  offers: { "@type": "Offer", price: "0", priceCurrency: "IDR" },
   description:
     "Konversi dan kompres file (gambar, PDF, Excel, CSV) langsung di browser, gratis dan tanpa upload ke server.",
 };
@@ -48,7 +38,6 @@ export default function Home() {
   return (
     <main className="min-h-screen pb-24">
       <JsonLd data={orgSchema} />
-      <JsonLd data={appSchema} />
       {/* Nav */}
       <header className="container-tight flex items-center justify-between py-5">
         <div className="flex items-center gap-2">
