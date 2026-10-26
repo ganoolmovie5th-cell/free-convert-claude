@@ -71,6 +71,13 @@ export default async function BlogPost({
         <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-ink-900">
           {post.title}
         </h1>
+        <time dateTime={post.date} className="mt-3 block text-sm text-ink-500">
+          {new Date(post.date).toLocaleDateString("id-ID", {
+            day: "numeric",
+            month: "long",
+            year: "numeric",
+          })}
+        </time>
         <div className="mt-6 space-y-4">
           {post.body.map((b, i) =>
             b.h ? (

@@ -39,17 +39,29 @@ export default function BlogIndex() {
           Blog & Panduan
         </h1>
         <ul className="mt-8 space-y-5">
-          {POSTS.map((p) => (
-            <li
-              key={p.slug}
-              className="rounded-xl border border-black/5 bg-white/70 p-5 transition hover:border-brand-300"
-            >
-              <Link href={`/blog/${p.slug}`}>
-                <h2 className="font-semibold text-ink-900">{p.title}</h2>
-                <p className="mt-1 text-sm text-ink-500">{p.description}</p>
-              </Link>
-            </li>
-          ))}
+          {[...POSTS]
+            .sort((a, b) => b.date.localeCompare(a.date))
+            .map((p) => (
+              <li
+                key={p.slug}
+                className="rounded-xl border border-black/5 bg-white/70 p-5 transition hover:border-brand-300"
+              >
+                <Link href={`/blog/${p.slug}`}>
+                  <h2 className="font-semibold text-ink-900">{p.title}</h2>
+                  <p className="mt-1 text-sm text-ink-500">{p.description}</p>
+                  <time
+                    dateTime={p.date}
+                    className="mt-2 block text-xs text-ink-500"
+                  >
+                    {new Date(p.date).toLocaleDateString("id-ID", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </time>
+                </Link>
+              </li>
+            ))}
         </ul>
       </section>
 

@@ -51,9 +51,22 @@ export default async function ToolPage({
     })),
   };
 
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: tool.title,
+    description: tool.description,
+    step: tool.steps.map((s, i) => ({
+      "@type": "HowToStep",
+      position: i + 1,
+      text: s,
+    })),
+  };
+
   return (
     <main className="min-h-screen pb-16">
       <JsonLd data={faqSchema} />
+      <JsonLd data={howToSchema} />
       <header className="container-tight flex items-center justify-between py-5">
         <Link href="/" className="flex items-center gap-2">
           <BrandMark />
@@ -98,6 +111,35 @@ export default async function ToolPage({
         ) : (
           <Converter only={tool.kind} lockTarget={tool.lockTarget} />
         )}
+      </section>
+
+      {/* How-to steps */}
+      <section className="container-tight mt-16 max-w-2xl">
+        <h2 className="text-xl font-bold text-ink-900">Cara pakai</h2>
+        <ol className="mt-5 space-y-3">
+          {tool.steps.map((s, i) => (
+            <li key={i} className="flex gap-3 text-ink-700">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-100 text-xs font-semibold text-brand-700">
+                {i + 1}
+              </span>
+              <span className="text-sm leading-relaxed">{s}</span>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* Article body */}
+      <section className="container-tight mt-16 max-w-2xl">
+        {tool.body.map((b) => (
+          <div key={b.h} className="mt-8 first:mt-0">
+            <h2 className="text-xl font-bold text-ink-900">{b.h}</h2>
+            {b.p.map((para, i) => (
+              <p key={i} className="mt-3 leading-relaxed text-ink-700">
+                {para}
+              </p>
+            ))}
+          </div>
+        ))}
       </section>
 
       {/* FAQ */}

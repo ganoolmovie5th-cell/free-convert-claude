@@ -6,6 +6,7 @@ import JsonLd from "@/components/JsonLd";
 import ThemeToggle from "@/components/ThemeToggle";
 import BrandMark from "@/components/BrandMark";
 import { TOOLS } from "@/lib/tools";
+import { POSTS } from "@/lib/posts";
 
 const FEATURES = [
   {
@@ -136,6 +137,34 @@ export default function Home() {
               {s}
             </span>
           ))}
+        </div>
+      </section>
+
+      {/* Latest guides */}
+      <section className="container-tight mt-20">
+        <div className="flex items-baseline justify-between">
+          <h2 className="text-2xl font-bold text-ink-900">Panduan terbaru</h2>
+          <Link
+            href="/blog"
+            className="text-sm font-medium text-brand-700 hover:underline"
+          >
+            Lihat semua
+          </Link>
+        </div>
+        <div className="mt-6 grid gap-3 sm:grid-cols-3">
+          {[...POSTS]
+            .sort((a, b) => b.date.localeCompare(a.date))
+            .slice(0, 3)
+            .map((p) => (
+              <Link
+                key={p.slug}
+                href={`/blog/${p.slug}`}
+                className="rounded-xl border border-black/5 bg-white/70 p-5 transition hover:border-brand-300"
+              >
+                <h3 className="font-semibold text-ink-900">{p.title}</h3>
+                <p className="mt-1 text-sm text-ink-500">{p.description}</p>
+              </Link>
+            ))}
         </div>
       </section>
 
