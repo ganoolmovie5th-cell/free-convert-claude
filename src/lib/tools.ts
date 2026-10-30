@@ -635,6 +635,58 @@ export const TOOLS: Tool[] = [
     ],
   },
   {
+    slug: "hapus-background",
+    kind: "removebg",
+    nav: "Hapus Background",
+    title: "Hapus Background Gambar",
+    description:
+      "Hapus latar belakang foto secara otomatis dan dapatkan PNG transparan. Diproses di browser, tanpa upload ke server.",
+    body: [
+      {
+        h: "Untuk apa hapus background",
+        p: [
+          "Menghapus latar belakang berguna untuk foto produk toko online, pas foto, logo, atau gambar yang mau ditempel ke desain lain. Hasil PNG dengan latar transparan bisa langsung dipasang di atas warna atau gambar apa pun tanpa kotak putih yang mengganggu.",
+          "Alat ini mengenali subjek utama di foto secara otomatis, lalu memotongnya dari latar belakang. Tidak perlu menyeleksi manual.",
+        ],
+      },
+      {
+        h: "Diproses di perangkat kamu",
+        p: [
+          "Berbeda dengan kebanyakan layanan hapus background yang mengunggah foto ke server mereka, alat ini menjalankan model AI langsung di browser. Gambar tidak pernah dikirim ke mana pun. Pemrosesan pertama agak lama karena model dimuat sekali di awal, lalu gambar berikutnya lebih cepat.",
+        ],
+      },
+      {
+        h: "Agar hasil rapi",
+        p: [
+          "Hasil terbaik didapat saat subjek terlihat jelas dan kontras dengan latar belakang, misalnya orang atau produk dengan tepi yang tegas. Rambut halus, benda transparan, atau latar yang warnanya mirip subjek bisa menyisakan tepi yang kurang rapi.",
+        ],
+      },
+    ],
+    steps: [
+      "Pilih gambar dengan subjek yang jelas.",
+      "Tunggu model memproses dan memotong latar belakang.",
+      "Unduh hasilnya sebagai PNG transparan.",
+    ],
+    faq: [
+      {
+        q: "Apakah foto saya diunggah ke server?",
+        a: "Tidak. Penghapusan background berjalan sepenuhnya di browser kamu memakai model AI yang dimuat ke perangkat. Foto tidak pernah dikirim atau disimpan di server.",
+      },
+      {
+        q: "Kenapa proses pertama agak lama?",
+        a: "Model AI dimuat sekali di awal (beberapa MB). Setelah itu, gambar berikutnya diproses lebih cepat.",
+      },
+      {
+        q: "Format hasilnya apa?",
+        a: "PNG dengan latar transparan, sehingga bisa ditempel di atas warna atau gambar lain tanpa kotak putih.",
+      },
+      {
+        q: "Kenapa tepi hasilnya kurang rapi?",
+        a: "Rambut halus, benda transparan, atau latar yang warnanya mirip subjek paling sulit dipisah. Foto dengan subjek yang kontras dan tepi tegas memberi hasil paling bersih.",
+      },
+    ],
+  },
+  {
     slug: "qr-code",
     kind: "qr",
     nav: "Buat QR Code",

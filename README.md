@@ -19,6 +19,7 @@ Live: https://free-convert.web.id
 - Crop gambar (potong ke rasio 1:1/16:9/4:3)
 - Gabung gambar jadi satu (vertikal/horizontal)
 - Watermark gambar (teks diagonal berulang)
+- Hapus background gambar (AI di browser; hasil PNG transparan)
 - Tambah teks ke PDF (stempel posisi preset)
 - Hapus proteksi PDF (pembatasan copy/print/edit — bukan password buka)
 - OCR: ekstrak teks dari gambar (tesseract.js, Indonesia + Inggris)
@@ -58,6 +59,7 @@ Next.js 15 (App Router) · React 19 · TypeScript · Tailwind CSS 3
 
 Library konversi: `jspdf` (buat PDF), `pdf-lib` (gabung/pisah/hapus proteksi
 PDF), `pdfjs-dist` (baca/render PDF), `xlsx` (data), `fflate` (ZIP),
+`@imgly/background-removal` (hapus background, WASM/ONNX di browser),
 Canvas API (gambar + watermark).
 
 ## Jalankan lokal

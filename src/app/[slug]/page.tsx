@@ -4,6 +4,7 @@ import Link from "next/link";
 import Converter from "@/components/Converter";
 import TextTool from "@/components/TextTool";
 import OcrTool from "@/components/OcrTool";
+import RemoveBgTool from "@/components/RemoveBgTool";
 import SiteFooter from "@/components/SiteFooter";
 import JsonLd from "@/components/JsonLd";
 import ThemeToggle from "@/components/ThemeToggle";
@@ -108,6 +109,8 @@ export default async function ToolPage({
           <TextTool mode="base64" />
         ) : tool.kind === "ocr" ? (
           <OcrTool />
+        ) : tool.kind === "removebg" ? (
+          <RemoveBgTool />
         ) : (
           <Converter only={tool.kind} lockTarget={tool.lockTarget} />
         )}

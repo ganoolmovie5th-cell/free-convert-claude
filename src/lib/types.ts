@@ -13,6 +13,7 @@ export type ConvertKind =
   | "pdf2png"
   | "pdftext"
   | "ocr"
+  | "removebg"
   | "qr"
   | "base64";
 
@@ -45,6 +46,7 @@ export const ACCEPT_BY_KIND: Record<ConvertKind, string> = {
   pdf2png: "application/pdf,.pdf",
   pdftext: "application/pdf,.pdf",
   ocr: "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp",
+  removebg: "image/jpeg,image/png,image/webp,.jpg,.jpeg,.png,.webp",
   qr: "",
   base64: "",
 };
@@ -75,6 +77,7 @@ export const TARGETS_BY_KIND: Record<
   pdf2png: [{ value: "png", label: "PNG" }],
   pdftext: [{ value: "pdf", label: "PDF" }],
   ocr: [{ value: "json", label: "Teks" }],
+  removebg: [{ value: "png", label: "PNG" }],
   qr: [{ value: "png", label: "PNG" }],
   base64: [{ value: "json", label: "Teks" }],
 };
